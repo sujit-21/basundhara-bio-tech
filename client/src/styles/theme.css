@@ -1,0 +1,396 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&display=swap');
+
+:root {
+  --primary-bio: #2e7d32;       /* Forest Green */
+  --primary-tech: #d97706;      /* Earthy Amber/Gold */
+  --accent-neon: #4caf50;       /* Fresh Leaf Green */
+  --dark-bg-deep: #000000;      /* Pure Black */
+  --dark-bg-card: #121212;      /* Off-black / Charcoal */
+  --dark-bg-nav: rgba(0, 0, 0, 0.85); /* Semi-transparent black */
+  --light-bg-deep: #f4f6f4;     /* Slate-Sage White */
+  --light-bg-card: #ffffff;
+  --text-dark: #1b301a;
+  --text-light: #f3f4f6;        /* Clean light gray */
+  --transition-speed: 0.3s;
+  --font-sans: 'Inter', sans-serif;
+  --font-science: 'Orbitron', sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--light-bg-deep);
+  color: var(--text-dark);
+  transition: background-color var(--transition-speed), color var(--transition-speed);
+  overflow-x: hidden;
+}
+
+/* Scientific Theme Accents */
+.science-font {
+  font-family: var(--font-science);
+  letter-spacing: 0.05em;
+}
+
+.text-gradient-bio {
+  background: linear-gradient(135deg, var(--primary-bio), var(--primary-tech));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-gradient-science {
+  background: linear-gradient(135deg, var(--dark-bg-deep), #0f172a);
+}
+
+.bg-gradient-light {
+  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+}
+
+/* Glassmorphism Styles */
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.05);
+  transition: all var(--transition-speed) ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px 0 rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.dark-mode .glass-card {
+  background: var(--dark-bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+}
+
+.dark-mode .glass-card:hover {
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 12px 40px 0 rgba(16, 185, 129, 0.2);
+}
+
+/* Glass Navbar Styles & Spacing Fixes */
+.glass-nav {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  transition: background var(--transition-speed);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.dark-mode .glass-nav {
+  background: var(--dark-bg-nav);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .glass-nav .nav-link {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.dark-mode .glass-nav .nav-link:hover {
+  color: #ffffff !important;
+}
+
+.dark-mode .glass-nav .text-secondary {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.dark-mode .glass-nav .navbar-toggler-icon {
+  filter: invert(1) !important;
+}
+
+.dark-mode .glass-nav .dropdown-menu {
+  background-color: var(--dark-bg-card) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark-mode .glass-nav .dropdown-item {
+  color: var(--text-light) !important;
+}
+
+.dark-mode .glass-nav .dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.dark-mode .glass-nav .dropdown-divider {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark-mode .text-gradient-bio {
+  background: linear-gradient(135deg, var(--accent-neon), var(--primary-tech)) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+.glass-nav .navbar-brand {
+  transition: transform var(--transition-speed) ease;
+}
+
+.glass-nav .navbar-brand:hover {
+  transform: scale(1.03);
+}
+
+.glass-nav .nav-link {
+  font-size: 0.825rem !important; /* Compact premium size to prevent wrapping */
+  padding-left: 0.4rem !important;
+  padding-right: 0.4rem !important;
+  font-weight: 500 !important;
+  white-space: nowrap;
+  position: relative;
+  transition: color 0.2s ease-in-out;
+}
+
+/* Slightly more space on wider desktop viewports */
+@media (min-width: 1400px) {
+  .glass-nav .nav-link {
+    font-size: 0.9rem !important;
+    padding-left: 0.65rem !important;
+    padding-right: 0.65rem !important;
+  }
+}
+
+.glass-nav .nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0.4rem;
+  right: 0.4rem;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary-bio), var(--accent-neon));
+  transform: scaleX(0);
+  transition: transform 0.2s ease-in-out;
+}
+
+@media (min-width: 1400px) {
+  .glass-nav .nav-link::after {
+    left: 0.65rem;
+    right: 0.65rem;
+  }
+}
+
+.glass-nav .nav-link:hover::after,
+.glass-nav .nav-link.active::after {
+  transform: scaleX(1);
+}
+
+.glass-nav .nav-link.active {
+  color: var(--primary-bio) !important;
+  font-weight: 600 !important;
+}
+
+.dark-mode .glass-nav .nav-link.active {
+  color: var(--accent-neon) !important;
+}
+
+/* Custom Buttons */
+.btn-science-primary {
+  background: linear-gradient(135deg, var(--primary-bio), #059669);
+  color: white;
+  border: none;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.6rem 1.5rem;
+  transition: all var(--transition-speed);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+}
+
+.btn-science-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+  background: linear-gradient(135deg, #059669, #047857);
+  color: white;
+}
+
+.btn-science-secondary {
+  background: linear-gradient(135deg, var(--primary-tech), #0284c7);
+  color: white;
+  border: none;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.6rem 1.5rem;
+  transition: all var(--transition-speed);
+  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.3);
+}
+
+.btn-science-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.5);
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  color: white;
+}
+
+/* Admin Sidebar Layout */
+.admin-sidebar {
+  min-height: calc(100vh - 56px);
+  background: rgba(255, 255, 255, 0.9);
+  border-right: 1px solid rgba(226, 232, 240, 0.8);
+  backdrop-filter: blur(10px);
+}
+
+.dark-mode .admin-sidebar {
+  background: rgba(3, 7, 18, 0.95);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.admin-sidebar .nav-link {
+  color: var(--text-dark);
+  font-weight: 500;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.admin-sidebar .nav-link.active {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(14, 165, 233, 0.15));
+  color: var(--primary-bio);
+  font-weight: 600;
+}
+
+.dark-mode .admin-sidebar .nav-link {
+  color: var(--text-light);
+}
+
+.dark-mode .admin-sidebar .nav-link.active {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(14, 165, 233, 0.25));
+  color: #34d399;
+}
+
+/* Particle Canvas Container */
+.hero-canvas-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+/* Pulse / Animation utilities */
+@keyframes dna-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+
+.pulse-element {
+  animation: dna-pulse 4s infinite ease-in-out;
+}
+
+/* Dark Mode classes toggled on HTML / Body */
+.dark-mode, .dark-mode body {
+  background-color: var(--dark-bg-deep) !important;
+  color: var(--text-light) !important;
+}
+
+.dark-mode h1, .dark-mode h2, .dark-mode h3, .dark-mode h4, .dark-mode h5, .dark-mode h6 {
+  color: #ffffff !important;
+}
+
+.dark-mode .bg-gradient-science {
+  background: var(--dark-bg-deep) !important;
+}
+
+.dark-mode .modal-content {
+  background-color: var(--dark-bg-card) !important;
+  color: var(--text-light) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Form inputs on Dark Mode */
+.dark-mode .form-control, .dark-mode .form-select {
+  background-color: #0d0d0d !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+}
+
+.dark-mode .form-control:focus, .dark-mode .form-select:focus {
+  background-color: #0d0d0d !important;
+  color: white !important;
+  border-color: var(--primary-bio) !important;
+  box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.25) !important;
+}
+
+/* Dark Mode Utility Overrides */
+.dark-mode .bg-light {
+  background-color: #080808 !important;
+  color: var(--text-light) !important;
+}
+
+.dark-mode .bg-white {
+  background-color: var(--dark-bg-card) !important;
+  color: var(--text-light) !important;
+}
+
+.dark-mode .dark-mode-deep {
+  background: var(--dark-bg-deep) !important;
+}
+
+.dark-mode .text-dark {
+  color: #ffffff !important;
+}
+
+.dark-mode .text-muted {
+  color: #9ca3af !important;
+}
+
+.dark-mode .card {
+  background-color: var(--dark-bg-card) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: var(--text-light) !important;
+}
+
+.dark-mode .list-group-item {
+  background-color: transparent !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: var(--text-light) !important;
+}
+
+.dark-mode .table {
+  color: #ffffff !important;
+}
+
+.dark-mode .table th, .dark-mode .table td {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Custom Table for admin */
+.custom-table {
+  border-collapse: separate;
+  border-spacing: 0 8px;
+}
+
+.custom-table tr {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+  transition: transform 0.2s;
+}
+
+.dark-mode .custom-table tr {
+  background: var(--dark-bg-card) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.custom-table td, .custom-table th {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+.custom-table tr:hover {
+  transform: scale(1.005);
+}
+
+.hover-text-success {
+  transition: color 0.2s;
+}
+.hover-text-success:hover {
+  color: var(--primary-bio) !important;
+}

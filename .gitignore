@@ -1,0 +1,30 @@
+# Node Modules
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Environment Variables
+.env
+server/.env
+client/.env
+
+# Build Output
+client/dist/
+dist/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDE Files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
