@@ -394,3 +394,13 @@ body {
 .hover-text-success:hover {
   color: var(--primary-bio) !important;
 }
+
+/* Home Page Custom Background */
+.home-container {
+  background: linear-gradient(180deg, #f1f8f1 0%, #ffffff 100%);
+  transition: background var(--transition-speed);
+}
+
+.dark-mode .home-container {
+  background: linear-gradient(180deg, #050c05 0%, #000000 100%) !important;
+}
