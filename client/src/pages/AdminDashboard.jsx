@@ -16,6 +16,10 @@ const AdminDashboard = () => {
   const [research, setResearch] = useState([]);
   const [importExport, setImportExport] = useState([]);
   const [contacts, setContacts] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [orderSearch, setOrderSearch] = useState('');
+  const [orderStatusFilter, setOrderStatusFilter] = useState('');
   const [loading, setLoading] = useState(true);
 
   // Form toggles
@@ -44,7 +48,7 @@ const AdminDashboard = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [statsRes, categoriesRes, productsRes, blogsRes, researchRes, ieRes, contactsRes, officesRes] = await Promise.all([
+      const [statsRes, categoriesRes, productsRes, blogsRes, researchRes, ieRes, contactsRes, officesRes, ordersRes] = await Promise.all([
         api.get('/analytics'),
         api.get('/categories'),
         api.get('/products?limit=100'),
@@ -53,6 +57,7 @@ const AdminDashboard = () => {
         api.get('/importexport'),
         api.get('/contacts?limit=100'),
         api.get('/offices'),
+        api.get('/orders?limit=100'),
       ]);
 
       if (statsRes.data.success) setStats(statsRes.data.data);
@@ -63,6 +68,7 @@ const AdminDashboard = () => {
       if (ieRes.data.success) setImportExport(ieRes.data.data);
       if (contactsRes.data.success) setContacts(contactsRes.data.data);
       if (officesRes.data.success) setOffices(officesRes.data.data);
+      if (ordersRes.data.success) setOrders(ordersRes.data.data);
     } catch (err) {
       console.error(err);
       triggerAlert('Failed to synchronize system records.', 'danger');
@@ -213,6 +219,34 @@ const AdminDashboard = () => {
     }
   };
 
+  // Order status update
+  const handleOrderStatusUpdate = async (id, status) => {
+    try {
+      await api.put(`/orders/${id}`, { status });
+      triggerAlert('Order status updated successfully.');
+      loadData();
+    } catch (err) {
+      triggerAlert('Failed to update order status.', 'danger');
+    }
+  };
+
+  // Order delete
+  const handleOrderDelete = async (id) => {
+    if (!window.confirm('Delete this order record permanently?')) return;
+    try {
+      const res = await api.delete(`/orders/${id}`);
+      if (res.data.success) {
+        triggerAlert('Order successfully purged.');
+        loadData();
+        if (selectedOrder?._id === id) {
+          setSelectedOrder(null);
+        }
+      }
+    } catch (err) {
+      triggerAlert('Failed to delete order record.', 'danger');
+    }
+  };
+
   // Form opening helpers
   const openAddForm = (type) => {
     setIsEditMode(false);
@@ -319,6 +353,10 @@ const AdminDashboard = () => {
               <button onClick={() => { setActiveTab('products'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent ${activeTab === 'products' ? 'active' : ''}`}>
                 <i className="bi bi-basket3-fill me-2"></i> Products
               </button>
+              <button onClick={() => { setActiveTab('orders'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent ${activeTab === 'orders' ? 'active' : ''}`}>
+                <i className="bi bi-receipt-cutoff me-2"></i> Orders
+                {stats?.orders?.pending > 0 && <span className="badge bg-danger ms-2">{stats.orders.pending}</span>}
+              </button>
               <button onClick={() => { setActiveTab('importexport'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent ${activeTab === 'importexport' ? 'active' : ''}`}>
                 <i className="bi bi-globe2 me-2"></i> Logistics
               </button>
@@ -396,6 +434,20 @@ const AdminDashboard = () => {
                       </div>
                       <div className="col-md-3 col-6">
                         <div className="card glass-card p-4 border border-secondary border-opacity-10 text-center">
+                          <i className="bi bi-receipt-cutoff fs-1 text-primary mb-2"></i>
+                          <h3 className="fw-bold science-font">{stats.orders?.total || 0}</h3>
+                          <span className="text-muted small">Total Orders</span>
+                        </div>
+                      </div>
+                      <div className="col-md-3 col-6">
+                        <div className="card glass-card p-4 border border-secondary border-opacity-10 text-center">
+                          <i className="bi bi-currency-rupee fs-1 text-success mb-2"></i>
+                          <h3 className="fw-bold science-font">Rs. {(stats.orders?.revenue || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</h3>
+                          <span className="text-muted small">Revenue</span>
+                        </div>
+                      </div>
+                      <div className="col-md-3 col-6">
+                        <div className="card glass-card p-4 border border-secondary border-opacity-10 text-center">
                           <i className="bi bi-chat-dots fs-1 text-primary mb-2"></i>
                           <h3 className="fw-bold science-font">{stats.counts.contacts}</h3>
                           <span className="text-muted small">Total Inquiries</span>
@@ -412,33 +464,58 @@ const AdminDashboard = () => {
 
                     <div className="row g-4">
                       {/* Inquiry summary */}
-                      <div className="col-lg-6">
+                      <div className="col-lg-4">
                         <div className="card glass-card p-4 border border-secondary border-opacity-10 h-100">
-                          <h5 className="science-font fw-bold mb-4 text-dark"><i className="bi bi-inbox-fill text-success me-2"></i>Inquiries Box Status</h5>
+                          <h5 className="science-font fw-bold mb-4 text-dark"><i className="bi bi-inbox-fill text-success me-2"></i>Inquiries Box</h5>
                           <div className="d-flex flex-column gap-3">
-                            <div className="d-flex justify-content-between align-items-center p-3 bg-light rounded">
-                              <span className="fw-semibold text-danger"><i className="bi bi-envelope-fill me-2"></i>Pending Commercial Inquiries</span>
+                            <div className="d-flex justify-content-between align-items-center p-2.5 bg-light rounded">
+                              <span className="fw-semibold text-danger small"><i className="bi bi-envelope-fill me-2"></i>Pending</span>
                               <span className="badge bg-danger fs-6">{stats.messages.unread}</span>
                             </div>
-                            <div className="d-flex justify-content-between align-items-center p-3 bg-light rounded">
-                              <span className="fw-semibold text-warning"><i className="bi bi-envelope-open-fill me-2"></i>In Investigation / Read</span>
+                            <div className="d-flex justify-content-between align-items-center p-2.5 bg-light rounded">
+                              <span className="fw-semibold text-warning"><i className="bi bi-envelope-open-fill me-2"></i>Read</span>
                               <span className="badge bg-warning text-dark fs-6">{stats.messages.read}</span>
                             </div>
-                            <div className="d-flex justify-content-between align-items-center p-3 bg-light rounded">
-                              <span className="fw-semibold text-success"><i className="bi bi-check-circle-fill me-2"></i>Replied / Dispatched</span>
+                            <div className="d-flex justify-content-between align-items-center p-2.5 bg-light rounded">
+                              <span className="fw-semibold text-success"><i className="bi bi-check-circle-fill me-2"></i>Replied</span>
                               <span className="badge bg-success fs-6">{stats.messages.replied}</span>
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      {/* Products per category distribution */}
-                      <div className="col-lg-6">
+                      {/* Order summary */}
+                      <div className="col-lg-4">
                         <div className="card glass-card p-4 border border-secondary border-opacity-10 h-100">
-                          <h5 className="science-font fw-bold mb-4 text-dark"><i className="bi bi-pie-chart-fill text-primary me-2"></i>Product Volume Splits</h5>
+                          <h5 className="science-font fw-bold mb-4 text-dark"><i className="bi bi-truck text-primary me-2"></i>Orders Status</h5>
+                          <div className="d-flex flex-column gap-2">
+                            <div className="d-flex justify-content-between align-items-center p-2 bg-light rounded">
+                              <span className="fw-semibold text-danger small"><i className="bi bi-clock-history me-2"></i>Pending</span>
+                              <span className="badge bg-danger">{stats.orders?.pending || 0}</span>
+                            </div>
+                            <div className="d-flex justify-content-between align-items-center p-2 bg-light rounded">
+                              <span className="fw-semibold text-warning small"><i className="bi bi-gear-fill me-2"></i>Processing</span>
+                              <span className="badge bg-warning text-dark">{stats.orders?.processing || 0}</span>
+                            </div>
+                            <div className="d-flex justify-content-between align-items-center p-2 bg-light rounded">
+                              <span className="fw-semibold text-primary small"><i className="bi bi-truck me-2"></i>Shipped</span>
+                              <span className="badge bg-primary">{stats.orders?.shipped || 0}</span>
+                            </div>
+                            <div className="d-flex justify-content-between align-items-center p-2 bg-light rounded">
+                              <span className="fw-semibold text-success small"><i className="bi bi-check-circle-fill me-2"></i>Completed</span>
+                              <span className="badge bg-success">{stats.orders?.completed || 0}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Products per category distribution */}
+                      <div className="col-lg-4">
+                        <div className="card glass-card p-4 border border-secondary border-opacity-10 h-100">
+                          <h5 className="science-font fw-bold mb-4 text-dark"><i className="bi bi-pie-chart-fill text-success me-2"></i>Product Splits</h5>
                           <ul className="list-group list-group-flush">
                             {stats.distributions.products.map((dist, idx) => (
-                              <li className="list-group-item d-flex justify-content-between align-items-center bg-transparent border-secondary border-opacity-10 px-0" key={idx}>
+                              <li className="list-group-item d-flex justify-content-between align-items-center bg-transparent border-secondary border-opacity-10 px-0 py-2" key={idx}>
                                 <span className="small text-secondary">{dist.name}</span>
                                 <span className="badge bg-secondary rounded-pill">{dist.count} items</span>
                               </li>
@@ -699,6 +776,133 @@ const AdminDashboard = () => {
                         </form>
                       </div>
                     )}
+                  </div>
+                )}
+
+                {/* --- TAB: MANAGE ORDERS --- */}
+                {activeTab === 'orders' && (
+                  <div>
+                    <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                      <div>
+                        <h3 className="science-font fs-4 fw-bold mb-1">Customer Product Orders ({orders.length})</h3>
+                        <p className="text-muted small mb-0">View invoices, track fulfillment status, and manage purchase records.</p>
+                      </div>
+                      <div className="d-flex flex-wrap gap-2">
+                        <input
+                          type="text"
+                          className="form-control form-control-sm"
+                          placeholder="Search order #, customer..."
+                          style={{ maxWidth: '220px' }}
+                          value={orderSearch}
+                          onChange={(e) => setOrderSearch(e.target.value)}
+                        />
+                        <select
+                          className="form-select form-select-sm"
+                          style={{ maxWidth: '150px' }}
+                          value={orderStatusFilter}
+                          onChange={(e) => setOrderStatusFilter(e.target.value)}
+                        >
+                          <option value="">All Statuses</option>
+                          <option value="Pending">Pending</option>
+                          <option value="Processing">Processing</option>
+                          <option value="Shipped">Shipped</option>
+                          <option value="Completed">Completed</option>
+                          <option value="Cancelled">Cancelled</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="table-responsive">
+                      <table className="table custom-table align-middle">
+                        <thead>
+                          <tr>
+                            <th>Order Number</th>
+                            <th>Customer Info</th>
+                            <th>Date Placed</th>
+                            <th>Fulfillment Status</th>
+                            <th>Total Amount</th>
+                            <th>Payment Method</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {orders
+                            .filter(order => {
+                              const matchSearch = orderSearch.trim() === '' || 
+                                order.orderNumber.toLowerCase().includes(orderSearch.toLowerCase()) ||
+                                order.customer.name.toLowerCase().includes(orderSearch.toLowerCase()) ||
+                                order.customer.email.toLowerCase().includes(orderSearch.toLowerCase());
+                              const matchStatus = orderStatusFilter === '' || order.status === orderStatusFilter;
+                              return matchSearch && matchStatus;
+                            })
+                            .map((o) => (
+                              <tr key={o._id}>
+                                <td>
+                                  <button
+                                    onClick={() => setSelectedOrder(o)}
+                                    className="btn btn-link p-0 fw-bold text-success text-decoration-none science-font"
+                                  >
+                                    {o.orderNumber}
+                                  </button>
+                                </td>
+                                <td>
+                                  <div className="fw-semibold text-dark">{o.customer.name}</div>
+                                  <div className="small text-muted">{o.customer.email}</div>
+                                </td>
+                                <td className="small">{new Date(o.createdAt).toLocaleDateString('en-IN', {
+                                  year: 'numeric',
+                                  month: 'short',
+                                  day: 'numeric'
+                                })}</td>
+                                <td>
+                                  <select
+                                    value={o.status}
+                                    onChange={(e) => handleOrderStatusUpdate(o._id, e.target.value)}
+                                    className={`form-select form-select-sm fw-bold border-0 text-white ${
+                                      o.status === 'Pending' ? 'bg-danger' : 
+                                      o.status === 'Processing' ? 'bg-warning text-dark' : 
+                                      o.status === 'Shipped' ? 'bg-primary' : 
+                                      o.status === 'Completed' ? 'bg-success' : 'bg-secondary'
+                                    }`}
+                                    style={{ width: '130px' }}
+                                  >
+                                    <option value="Pending" className="bg-danger text-white">Pending</option>
+                                    <option value="Processing" className="bg-warning text-dark">Processing</option>
+                                    <option value="Shipped" className="bg-primary text-white">Shipped</option>
+                                    <option value="Completed" className="bg-success text-white">Completed</option>
+                                    <option value="Cancelled" className="bg-secondary text-white">Cancelled</option>
+                                  </select>
+                                </td>
+                                <td className="font-monospace fw-semibold text-dark">Rs. {o.summary.grandTotal.toFixed(2)}</td>
+                                <td className="small">{o.customer.paymentMethod}</td>
+                                <td>
+                                  <div className="d-flex gap-2">
+                                    <button
+                                      onClick={() => setSelectedOrder(o)}
+                                      className="btn btn-xs btn-outline-success py-1 px-2.5 small"
+                                      title="Inspect Invoice"
+                                    >
+                                      <i className="bi bi-eye"></i>
+                                    </button>
+                                    <button
+                                      onClick={() => handleOrderDelete(o._id)}
+                                      className="btn btn-xs btn-outline-danger py-1 px-2.5 small"
+                                      title="Delete Order Record"
+                                    >
+                                      <i className="bi bi-trash"></i>
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                          {orders.length === 0 && (
+                            <tr>
+                              <td colSpan="7" className="text-center py-4 text-muted">No orders found matching parameters.</td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 )}
 
@@ -1095,6 +1299,134 @@ const AdminDashboard = () => {
                   </div>
                 )}
               </>
+            )}
+
+            {/* Modal for Order Inspection */}
+            {selectedOrder && (
+              <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050 }} tabIndex="-1" role="dialog">
+                <div className="modal-dialog modal-lg modal-dialog-centered animate-fade-in" role="document">
+                  <div className="modal-content glass-card border border-secondary border-opacity-10 shadow-lg text-start" style={{ borderRadius: '20px' }}>
+                    <div className="modal-header border-bottom border-secondary border-opacity-10 px-4 py-3">
+                      <h5 className="modal-title science-font fw-bold text-gradient-bio"><i className="bi bi-receipt-cutoff me-2"></i>Order Invoice Clearance</h5>
+                      <button type="button" className="btn-close" onClick={() => setSelectedOrder(null)} aria-label="Close"></button>
+                    </div>
+                    <div className="modal-body p-4 overflow-auto" style={{ maxHeight: '70vh' }}>
+                      <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                        <div>
+                          <div className="d-flex align-items-center mb-1">
+                            <span className="science-font fw-bold fs-5 text-success">BASUNDHARA</span>
+                            <span className="science-font fw-light fs-5 text-dark ms-1">BIO-TECH</span>
+                          </div>
+                          <p className="text-muted small mb-0">Invoice #: <strong>{selectedOrder.orderNumber}</strong></p>
+                          <p className="text-muted small mb-0">Date Placed: {new Date(selectedOrder.createdAt).toLocaleString('en-IN')}</p>
+                        </div>
+                        <div className="text-end">
+                          <span className={`badge px-3 py-2 rounded-pill fw-bold text-white mb-2 d-inline-block ${
+                            selectedOrder.status === 'Pending' ? 'bg-danger' : 
+                            selectedOrder.status === 'Processing' ? 'bg-warning text-dark' : 
+                            selectedOrder.status === 'Shipped' ? 'bg-primary' : 
+                            selectedOrder.status === 'Completed' ? 'bg-success' : 'bg-secondary'
+                          }`}>
+                            {selectedOrder.status.toUpperCase()}
+                          </span>
+                          <div className="text-muted small">Method: <strong>{selectedOrder.customer.paymentMethod}</strong></div>
+                        </div>
+                      </div>
+
+                      <div className="row g-3 mb-4">
+                        <div className="col-md-6">
+                          <h6 className="science-font fw-bold text-success mb-2"><i className="bi bi-person-fill me-1"></i>Billed To:</h6>
+                          <div className="p-3 bg-light rounded-3 border h-100">
+                            <p className="text-dark mb-1 fw-bold">{selectedOrder.customer.name}</p>
+                            <p className="text-muted small mb-1"><i className="bi bi-envelope me-1"></i>{selectedOrder.customer.email}</p>
+                            <p className="text-muted small mb-1"><i className="bi bi-telephone me-1"></i>{selectedOrder.customer.phone}</p>
+                            <p className="text-muted small mb-0"><i className="bi bi-geo-alt me-1"></i>{selectedOrder.customer.address}</p>
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <h6 className="science-font fw-bold text-primary mb-2"><i className="bi bi-truck me-1"></i>Fulfillment Control:</h6>
+                          <div className="p-3 bg-light rounded-3 border h-100 d-flex flex-column justify-content-between">
+                            <div>
+                              <p className="small text-muted mb-2">Modify order state parameters in real-time:</p>
+                              <select
+                                value={selectedOrder.status}
+                                onChange={(e) => {
+                                  handleOrderStatusUpdate(selectedOrder._id, e.target.value);
+                                  setSelectedOrder({ ...selectedOrder, status: e.target.value });
+                                }}
+                                className="form-select form-select-sm fw-bold"
+                              >
+                                <option value="Pending">Pending</option>
+                                <option value="Processing">Processing</option>
+                                <option value="Shipped">Shipped</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Cancelled">Cancelled</option>
+                              </select>
+                            </div>
+                            <div className="mt-3 pt-2 border-top text-end">
+                              <button onClick={() => { window.print(); }} className="btn btn-xs btn-outline-secondary py-1 px-3 small">
+                                <i className="bi bi-printer-fill me-1"></i> Print Invoice
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <h6 className="science-font fw-bold text-dark mb-2"><i className="bi bi-list-check me-1"></i>Line Items Breakdown:</h6>
+                      <div className="table-responsive mb-4">
+                        <table className="table table-bordered align-middle">
+                          <thead className="table-light">
+                            <tr>
+                              <th className="small fw-bold">Product Title</th>
+                              <th className="text-center small fw-bold" style={{ width: '120px' }}>Unit Price</th>
+                              <th className="text-center small fw-bold" style={{ width: '80px' }}>Qty</th>
+                              <th className="text-end small fw-bold" style={{ width: '140px' }}>Subtotal</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {selectedOrder.items.map((item, idx) => (
+                              <tr key={idx}>
+                                <td>
+                                  <span className="fw-semibold text-dark d-block">{item.title}</span>
+                                </td>
+                                <td className="text-center font-monospace small">Rs. {item.price.toFixed(2)}</td>
+                                <td className="text-center font-monospace small">{item.quantity}</td>
+                                <td className="text-end font-monospace small">Rs. {item.subtotal.toFixed(2)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div className="row justify-content-end text-end g-2">
+                        <div className="col-md-6 col-lg-5">
+                          <div className="d-flex justify-content-between py-1 border-bottom small">
+                            <span className="text-muted">Subtotal:</span>
+                            <span className="font-monospace text-dark">Rs. {selectedOrder.summary.subtotal.toFixed(2)}</span>
+                          </div>
+                          <div className="d-flex justify-content-between py-1 border-bottom small">
+                            <span className="text-muted">Bio-Tax (5%):</span>
+                            <span className="font-monospace text-dark">Rs. {selectedOrder.summary.tax.toFixed(2)}</span>
+                          </div>
+                          <div className="d-flex justify-content-between py-1 border-bottom small">
+                            <span className="text-muted">Logistics Shipping:</span>
+                            <span className="font-monospace text-dark">
+                              {selectedOrder.summary.shipping === 0 ? <span className="text-success fw-bold">FREE</span> : `Rs. ${selectedOrder.summary.shipping.toFixed(2)}`}
+                            </span>
+                          </div>
+                          <div className="d-flex justify-content-between py-2 mt-2 bg-light px-2 rounded">
+                            <span className="fw-bold text-dark">Grand Total:</span>
+                            <span className="font-monospace fw-bold text-success">Rs. {selectedOrder.summary.grandTotal.toFixed(2)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="modal-footer border-top border-secondary border-opacity-10 px-4 py-2.5">
+                      <button type="button" className="btn btn-sm btn-secondary px-4" onClick={() => setSelectedOrder(null)}>Close Inspection</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
 

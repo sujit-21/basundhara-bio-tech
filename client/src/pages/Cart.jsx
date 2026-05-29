@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import api from '../services/api';
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -92,7 +93,7 @@ const Cart = () => {
   };
 
   // Handle Checkout / Invoice Placement
-  const handleCheckout = (e) => {
+  const handleCheckout = async (e) => {
     e.preventDefault();
     const { name, email, phone, address } = billingDetails;
 
@@ -108,19 +109,12 @@ const Cart = () => {
 
     // Generate Invoice Data
     const invoiceNum = 'BBT-' + Math.floor(100000 + Math.random() * 900000);
-    const invoiceDate = new Date().toLocaleDateString('en-IN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
 
     const detailedInvoice = {
-      invoiceNumber: invoiceNum,
-      date: invoiceDate,
+      orderNumber: invoiceNum,
       customer: { ...billingDetails },
       items: cartItems.map(item => ({
+        product: item.product._id,
         title: item.product.title,
         price: getNumericPrice(item.product.price),
         quantity: item.quantity,
@@ -134,12 +128,34 @@ const Cart = () => {
       }
     };
 
-    setInvoiceData(detailedInvoice);
-    setShowInvoice(true);
-    setErrorMsg('');
-
-    // Clear cart after checkout
-    saveCart([]);
+    try {
+      const response = await api.post('/orders', detailedInvoice);
+      if (response.data && response.data.success) {
+        const orderData = response.data.data;
+        const savedInvoice = {
+          invoiceNumber: orderData.orderNumber,
+          date: new Date(orderData.createdAt).toLocaleDateString('en-IN', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          }),
+          customer: orderData.customer,
+          items: orderData.items,
+          summary: orderData.summary
+        };
+        setInvoiceData(savedInvoice);
+        setShowInvoice(true);
+        setErrorMsg('');
+        saveCart([]);
+      } else {
+        setErrorMsg(response.data?.message || 'Failed to place order.');
+      }
+    } catch (err) {
+      console.error(err);
+      setErrorMsg(err.response?.data?.message || 'An error occurred while placing the order. Please try again.');
+    }
   };
 
   const handlePrint = () => {

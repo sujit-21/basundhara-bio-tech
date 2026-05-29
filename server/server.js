@@ -15,6 +15,7 @@ const contactRoutes = require('./routes/contactRoutes');
 const importexportRoutes = require('./routes/importexportRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const officeRoutes = require('./routes/officeRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 
 // Load environment variables
 dotenv.config();
@@ -59,6 +60,7 @@ app.use(['/api/contacts', '/contacts'], contactRoutes);
 app.use(['/api/importexport', '/importexport'], importexportRoutes);
 app.use(['/api/analytics', '/analytics'], analyticsRoutes);
 app.use(['/api/offices', '/offices'], officeRoutes);
+app.use(['/api/orders', '/orders'], orderRoutes);
 
 // Simple Welcome Route
 app.get('/', (req, res) => {
