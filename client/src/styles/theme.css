@@ -38,7 +38,7 @@ body {
 }
 
 .bg-gradient-science {
-  background: linear-gradient(135deg, var(--dark-bg-deep), #0f172a);
+  background: linear-gradient(135deg, #010601 0%, #082d08 50%, #000000 100%);
 }
 
 .bg-gradient-light {
@@ -295,7 +295,7 @@ body {
 }
 
 .dark-mode .bg-gradient-science {
-  background: var(--dark-bg-deep) !important;
+  background: linear-gradient(135deg, #000200 0%, #051a05 50%, #000000 100%) !important;
 }
 
 .dark-mode .modal-content {
