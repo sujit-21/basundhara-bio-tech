@@ -61,17 +61,7 @@ const Home = () => {
               </div>
             </div>
             <div className="col-lg-5 d-none d-lg-block position-relative">
-              {/* Floating stats card */}
-              <div className="glass-card p-4 text-start border border-secondary border-opacity-25 position-absolute top-50 start-50 translate-middle w-75 pulse-element">
-                <h5 className="science-font text-gradient-bio mb-2"><i className="bi bi-globe me-2"></i>Global Shipments</h5>
-                <div className="progress mb-2" style={{ height: '6px' }}>
-                  <div className="progress-bar progress-bar-striped progress-bar-animated bg-success" style={{ width: '92%' }}></div>
-                </div>
-                <div className="d-flex justify-content-between small text-secondary">
-                  <span>Logistics Pipeline</span>
-                  <span className="text-white">Active (92% load)</span>
-                </div>
-              </div>
+              {/* Floating stats card removed */}
             </div>
           </div>
         </div>

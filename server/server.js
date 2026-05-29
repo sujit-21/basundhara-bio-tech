@@ -49,16 +49,16 @@ const apiLimiter = rateLimit({
 // Apply rate limiter to API routes (except GET routes if desired, but we can apply it globally to all /api/ paths)
 app.use('/api/', apiLimiter);
 
-// Bind Route Handlers
-app.use('/api/auth', authRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/products', productRoutes);
-app.use('/api/blogs', blogRoutes);
-app.use('/api/research', researchRoutes);
-app.use('/api/contacts', contactRoutes);
-app.use('/api/importexport', importexportRoutes);
-app.use('/api/analytics', analyticsRoutes);
-app.use('/api/offices', officeRoutes);
+// Bind Route Handlers (supporting both /api and root paths for deployment compatibility)
+app.use(['/api/auth', '/auth'], authRoutes);
+app.use(['/api/categories', '/categories'], categoryRoutes);
+app.use(['/api/products', '/products'], productRoutes);
+app.use(['/api/blogs', '/blogs'], blogRoutes);
+app.use(['/api/research', '/research'], researchRoutes);
+app.use(['/api/contacts', '/contacts'], contactRoutes);
+app.use(['/api/importexport', '/importexport'], importexportRoutes);
+app.use(['/api/analytics', '/analytics'], analyticsRoutes);
+app.use(['/api/offices', '/offices'], officeRoutes);
 
 // Simple Welcome Route
 app.get('/', (req, res) => {
@@ -81,6 +81,10 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Server running in development mode on port ${PORT}`);
+  });
+}
+
+module.exports = app;

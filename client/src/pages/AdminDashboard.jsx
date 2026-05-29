@@ -84,6 +84,9 @@ const AdminDashboard = () => {
       if (res.data.success) {
         triggerAlert('Record successfully purged.');
         loadData();
+        if (endpoint.includes('/offices')) {
+          window.dispatchEvent(new CustomEvent('offices-updated'));
+        }
       }
     } catch (err) {
       triggerAlert('Purge request failed.', 'danger');
@@ -193,6 +196,7 @@ const AdminDashboard = () => {
       }
       setShowForm(false);
       loadData();
+      window.dispatchEvent(new CustomEvent('offices-updated'));
     } catch (err) {
       triggerAlert(err.response?.data?.message || 'Office action failed.', 'danger');
     }

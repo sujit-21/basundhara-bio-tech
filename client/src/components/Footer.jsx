@@ -17,9 +17,18 @@ const Footer = () => {
         console.error('Failed to load offices in footer:', err);
       }
     };
+
     fetchOffices();
+
+    const handleOfficesUpdated = () => {
+      fetchOffices();
+    };
+
+    window.addEventListener('offices-updated', handleOfficesUpdated);
+
     return () => {
       isMounted = false;
+      window.removeEventListener('offices-updated', handleOfficesUpdated);
     };
   }, []);
 
