@@ -41,6 +41,24 @@ body {
   background: linear-gradient(135deg, #010601 0%, #082d08 50%, #000000 100%);
 }
 
+.bg-hero-science {
+  background: linear-gradient(135deg, #e8f5e9 0%, #fef3c7 100%);
+  color: var(--text-dark);
+}
+
+.bg-hero-science h1,
+.bg-hero-science h2,
+.bg-hero-science h3,
+.bg-hero-science h4,
+.bg-hero-science h5,
+.bg-hero-science h6 {
+  color: var(--text-dark) !important;
+}
+
+.bg-hero-science .lead {
+  color: #374151;
+}
+
 .bg-gradient-light {
   background: linear-gradient(135deg, #f8fafc, #e2e8f0);
 }
@@ -296,6 +314,24 @@ body {
 
 .dark-mode .bg-gradient-science {
   background: linear-gradient(135deg, #000200 0%, #051a05 50%, #000000 100%) !important;
+}
+
+.dark-mode .bg-hero-science {
+  background: linear-gradient(135deg, #000200 0%, #051a05 50%, #000000 100%) !important;
+  color: var(--text-light) !important;
+}
+
+.dark-mode .bg-hero-science h1,
+.dark-mode .bg-hero-science h2,
+.dark-mode .bg-hero-science h3,
+.dark-mode .bg-hero-science h4,
+.dark-mode .bg-hero-science h5,
+.dark-mode .bg-hero-science h6 {
+  color: #ffffff !important;
+}
+
+.dark-mode .bg-hero-science .lead {
+  color: #9ca3af !important;
 }
 
 .dark-mode .modal-content {

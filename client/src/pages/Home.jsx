@@ -35,7 +35,7 @@ const Home = () => {
   return (
     <div className="home-container">
       {/* 1. Hero Section */}
-      <section className="bg-gradient-science text-white position-relative overflow-hidden py-5 d-flex align-items-center" style={{ minHeight: '85vh' }}>
+      <section className="bg-hero-science position-relative overflow-hidden py-5 d-flex align-items-center" style={{ minHeight: '85vh' }}>
         <div className="hero-canvas-container">
           <DNAAnimation />
         </div>
@@ -45,17 +45,17 @@ const Home = () => {
               <span className="badge bg-success bg-opacity-25 border border-success text-success px-3 py-2 rounded-pill science-font mb-3">
                 <i className="bi bi-patch-check-fill me-1"></i> Sustainable Development & Global Trade
               </span>
-              <h1 className="display-4 fw-bold mb-3 science-font text-white lh-base">
+              <h1 className="display-4 fw-bold mb-3 science-font lh-base">
                 Cultivating <span className="text-gradient-bio">Green Innovations</span> For Global Trade
               </h1>
-              <p className="lead text-secondary mb-4">
+              <p className="lead mb-4">
                 Basundhara Bio-Tech blends biological engineering with ecological agriculture, high-efficiency cold food processing, natural health supplements, circular recycling, and compliant import-export supply lines.
               </p>
               <div className="d-flex flex-wrap gap-3">
                 <Link to="/products" className="btn btn-science-primary btn-lg">
                   Explore Products <i className="bi bi-basket3 ms-1"></i>
                 </Link>
-                <Link to="/categories" className="btn btn-outline-light border-opacity-25 btn-lg">
+                <Link to="/categories" className="btn btn-outline-success btn-lg">
                   Industry Sectors
                 </Link>
               </div>
