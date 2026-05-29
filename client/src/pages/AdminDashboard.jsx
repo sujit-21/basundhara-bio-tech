@@ -657,7 +657,7 @@ const AdminDashboard = () => {
                           </div>
                           <div className="row mb-3">
                             <div className="col-md-6">
-                              <label className="form-label small fw-bold text-dark">Price Structure (e.g. $12.00 / kg)</label>
+                              <label className="form-label small fw-bold text-dark">Price Structure (e.g. Rs./kg)</label>
                               <input type="text" className="form-control" value={productForm.price} onChange={e => setProductForm({ ...productForm, price: e.target.value })} required />
                             </div>
                             <div className="col-md-6">

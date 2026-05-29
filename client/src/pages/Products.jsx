@@ -128,6 +128,27 @@ const Products = () => {
     }
   };
 
+  const [cartSuccessAlert, setCartSuccessAlert] = useState({ show: false, message: '' });
+
+  const addToCart = (product) => {
+    try {
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const existingItem = cart.find(item => item.product._id === product._id);
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cart.push({ product, quantity: 1 });
+      }
+      localStorage.setItem('cart', JSON.stringify(cart));
+      window.dispatchEvent(new CustomEvent('cart-updated'));
+      
+      setCartSuccessAlert({ show: true, message: `"${product.title}" added to your cart.` });
+      setTimeout(() => setCartSuccessAlert({ show: false, message: '' }), 3000);
+    } catch (err) {
+      console.error('Failed to add to cart:', err);
+    }
+  };
+
   const openSpecsModal = (prod) => {
     setActiveProduct(prod);
     setShowInquiryForm(false);
@@ -136,6 +157,21 @@ const Products = () => {
 
   return (
     <div className="products-container py-5 text-start">
+      {/* Floating Toast Notification */}
+      {cartSuccessAlert.show && (
+        <div className="position-fixed bottom-0 end-0 p-3" style={{ zIndex: 1080 }}>
+          <div className="toast show align-items-center text-white bg-success border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+            <div className="d-flex">
+              <div className="toast-body d-flex align-items-center gap-2">
+                <i className="bi bi-check-circle-fill"></i>
+                {cartSuccessAlert.message}
+              </div>
+              <button type="button" className="btn-close btn-close-white me-2 m-auto" onClick={() => setCartSuccessAlert({ show: false, message: '' })}></button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="container">
         {/* Header */}
         <div className="text-center mb-5">
@@ -225,14 +261,23 @@ const Products = () => {
                     <p className="card-text text-muted small mb-4 flex-grow-1" style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                       {prod.description}
                     </p>
-                    <button
-                      onClick={() => openSpecsModal(prod)}
-                      className="btn btn-outline-success w-100 mt-auto btn-sm"
-                      data-bs-toggle="modal"
-                      data-bs-target="#productSpecsModal"
-                    >
-                      Specifications & Inquire <i className="bi bi-file-earmark-spreadsheet ms-1"></i>
-                    </button>
+                    <div className="d-flex gap-2 mt-auto">
+                      <button
+                        onClick={() => openSpecsModal(prod)}
+                        className="btn btn-outline-secondary btn-sm flex-grow-1"
+                        data-bs-toggle="modal"
+                        data-bs-target="#productSpecsModal"
+                      >
+                        Specs & Inquire <i className="bi bi-info-circle"></i>
+                      </button>
+                      <button
+                        onClick={() => addToCart(prod)}
+                        className="btn btn-success btn-sm px-3"
+                        title="Add to Cart"
+                      >
+                        <i className="bi bi-cart-plus-fill"></i>
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -354,8 +399,15 @@ const Products = () => {
               </div>
 
               {!showInquiryForm && (
-                <div className="modal-footer border-top-0 pt-0">
+                <div className="modal-footer border-top-0 pt-0 gap-2 justify-content-end">
                   <button type="button" className="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close Specs</button>
+                  <button 
+                    type="button" 
+                    onClick={() => { addToCart(activeProduct); }} 
+                    className="btn btn-success btn-sm d-flex align-items-center gap-1.5"
+                  >
+                    <i className="bi bi-cart-plus-fill"></i> Add to Cart
+                  </button>
                   <button type="button" onClick={() => setShowInquiryForm(true)} className="btn btn-science-primary btn-sm">
                     Inquire Commercial Contract <i className="bi bi-send ms-1"></i>
                   </button>

@@ -1,10 +1,30 @@
-import { useContext } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
 const Navbar = () => {
   const { user, logout, isAdmin, theme, toggleTheme } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  const [cartCount, setCartCount] = useState(0);
+
+  const updateCartCount = () => {
+    try {
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const count = cart.reduce((total, item) => total + (item.quantity || 0), 0);
+      setCartCount(count);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    updateCartCount();
+    window.addEventListener('cart-updated', updateCartCount);
+    return () => {
+      window.removeEventListener('cart-updated', updateCartCount);
+    };
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -61,6 +81,12 @@ const Navbar = () => {
             </li>
             <li className="nav-item">
               <NavLink className={({ isActive }) => `nav-link fw-semibold ${isActive ? 'text-success' : ''}`} to="/contact">Contact</NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink className={({ isActive }) => `nav-link fw-semibold d-flex align-items-center ${isActive ? 'text-success' : ''}`} to="/cart">
+                <i className="bi bi-cart3 me-1"></i> Cart
+                {cartCount > 0 && <span className="badge bg-danger ms-1 rounded-pill">{cartCount}</span>}
+              </NavLink>
             </li>
             {isAdmin && (
               <li className="nav-item">
