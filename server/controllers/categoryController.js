@@ -17,7 +17,7 @@ const getCategories = async (req, res, next) => {
 // @access  Private/Admin
 const createCategory = async (req, res, next) => {
   try {
-    const { name, description, image, subCategories } = req.body;
+    const { name, description, image, images, subCategories } = req.body;
 
     const exists = await Category.findOne({ name });
     if (exists) {
@@ -27,7 +27,8 @@ const createCategory = async (req, res, next) => {
     const category = new Category({
       name,
       description,
-      image,
+      image: image || (images && images.length > 0 ? images[0] : ''),
+      images: images || [],
       subCategories: subCategories || [],
     });
 
@@ -43,7 +44,7 @@ const createCategory = async (req, res, next) => {
 // @access  Private/Admin
 const updateCategory = async (req, res, next) => {
   try {
-    const { name, description, image, subCategories } = req.body;
+    const { name, description, image, images, subCategories } = req.body;
 
     const category = await Category.findById(req.params.id);
     if (!category) {
@@ -52,7 +53,8 @@ const updateCategory = async (req, res, next) => {
 
     category.name = name !== undefined ? name : category.name;
     category.description = description !== undefined ? description : category.description;
-    category.image = image !== undefined ? image : category.image;
+    category.images = images !== undefined ? images : category.images;
+    category.image = image !== undefined ? image : (category.images && category.images.length > 0 ? category.images[0] : '');
     category.subCategories = subCategories !== undefined ? subCategories : category.subCategories;
 
     const updated = await category.save();

@@ -31,9 +31,11 @@ const AdminDashboard = () => {
   const [alertInfo, setAlertInfo] = useState({ show: false, message: '', type: 'success' });
 
   // Form Input bindings
-  const [categoryForm, setCategoryForm] = useState({ name: '', description: '', image: '', subCategories: [] });
+  const [categoryForm, setCategoryForm] = useState({ name: '', description: '', image: '', images: [], subCategories: [] });
   const [newSubCategory, setNewSubCategory] = useState('');
-  const [productForm, setProductForm] = useState({ title: '', description: '', price: 'On Inquiry', image: '', category: '', subCategory: '', specifications: '', inStock: true });
+  const [categoryImageUrlInput, setCategoryImageUrlInput] = useState('');
+  const [productForm, setProductForm] = useState({ title: '', description: '', price: 'On Inquiry', image: '', images: [], category: '', subCategory: '', specifications: '', inStock: true });
+  const [productImageUrlInput, setProductImageUrlInput] = useState('');
   const [importExportForm, setImportExportForm] = useState({ title: '', description: '', destinationCountries: '', shippingModes: '', status: 'active' });
   const [blogForm, setBlogForm] = useState({ title: '', content: '', author: 'Dr. Basundhara Roy', tags: '', image: '', published: true });
   const [researchForm, setResearchForm] = useState({ title: '', abstract: '', authors: '', journal: '', publishDate: '', doi: '', pdfUrl: '/sample_research.pdf', category: 'Biofuels & Sustainability' });
@@ -254,10 +256,12 @@ const AdminDashboard = () => {
     setShowForm(true);
 
     if (type === 'categories') {
-      setCategoryForm({ name: '', description: '', image: '', subCategories: [] });
+      setCategoryForm({ name: '', description: '', image: '', images: [], subCategories: [] });
       setNewSubCategory('');
+      setCategoryImageUrlInput('');
     } else if (type === 'products') {
-      setProductForm({ title: '', description: '', price: 'On Inquiry', image: '', category: categories[0]?._id || '', subCategory: '', specifications: '', inStock: true });
+      setProductForm({ title: '', description: '', price: 'On Inquiry', image: '', images: [], category: categories[0]?._id || '', subCategory: '', specifications: '', inStock: true });
+      setProductImageUrlInput('');
     } else if (type === 'importexport') {
       setImportExportForm({ title: '', description: '', destinationCountries: '', shippingModes: 'Sea Freight (FCL)', status: 'active' });
     } else if (type === 'blogs') {
@@ -275,10 +279,12 @@ const AdminDashboard = () => {
     setShowForm(true);
 
     if (type === 'categories') {
-      setCategoryForm({ name: item.name, description: item.description, image: item.image, subCategories: item.subCategories || [] });
+      setCategoryForm({ name: item.name, description: item.description, image: item.image, images: item.images || (item.image ? [item.image] : []), subCategories: item.subCategories || [] });
       setNewSubCategory('');
+      setCategoryImageUrlInput('');
     } else if (type === 'products') {
-      setProductForm({ title: item.title, description: item.description, price: item.price, image: item.image, category: item.category?._id || item.category || '', subCategory: item.subCategory || '', specifications: (item.specifications || []).join(', '), inStock: item.inStock });
+      setProductForm({ title: item.title, description: item.description, price: item.price, image: item.image, images: item.images || (item.image ? [item.image] : []), category: item.category?._id || item.category || '', subCategory: item.subCategory || '', specifications: (item.specifications || []).join(', '), inStock: item.inStock });
+      setProductImageUrlInput('');
     } else if (type === 'importexport') {
       setImportExportForm({ title: item.title, description: item.description, destinationCountries: (item.destinationCountries || []).join(', '), shippingModes: (item.shippingModes || []).join(', '), status: item.status });
     } else if (type === 'blogs') {
@@ -311,25 +317,83 @@ const AdminDashboard = () => {
   };
 
   const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    let loadedImages = [];
+    let count = 0;
+    files.forEach((file) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setCategoryForm({ ...categoryForm, image: reader.result });
+        loadedImages.push(reader.result);
+        count++;
+        if (count === files.length) {
+          setCategoryForm((prev) => {
+            const updatedImages = [...(prev.images || []), ...loadedImages];
+            return {
+              ...prev,
+              images: updatedImages,
+              image: prev.image || updatedImages[0] || '',
+            };
+          });
+        }
       };
       reader.readAsDataURL(file);
-    }
+    });
+    e.target.value = '';
+  };
+
+  const handleAddCategoryImageByUrl = () => {
+    if (!categoryImageUrlInput.trim()) return;
+    setCategoryForm((prev) => {
+      const updatedImages = [...(prev.images || []), categoryImageUrlInput.trim()];
+      return {
+        ...prev,
+        images: updatedImages,
+        image: prev.image || updatedImages[0] || '',
+      };
+    });
+    setCategoryImageUrlInput('');
   };
 
   const handleProductImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    let loadedImages = [];
+    let count = 0;
+    files.forEach((file) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setProductForm({ ...productForm, image: reader.result });
+        loadedImages.push(reader.result);
+        count++;
+        if (count === files.length) {
+          setProductForm((prev) => {
+            const updatedImages = [...(prev.images || []), ...loadedImages];
+            return {
+              ...prev,
+              images: updatedImages,
+              image: prev.image || updatedImages[0] || '',
+            };
+          });
+        }
       };
       reader.readAsDataURL(file);
-    }
+    });
+    e.target.value = '';
+  };
+
+  const handleAddProductImageByUrl = () => {
+    if (!productImageUrlInput.trim()) return;
+    setProductForm((prev) => {
+      const updatedImages = [...(prev.images || []), productImageUrlInput.trim()];
+      return {
+        ...prev,
+        images: updatedImages,
+        image: prev.image || updatedImages[0] || '',
+      };
+    });
+    setProductImageUrlInput('');
   };
 
   return (
@@ -628,15 +692,85 @@ const AdminDashboard = () => {
 
                           {/* Image URL or Device Upload */}
                           <div className="mb-3">
-                            <label className="form-label small fw-bold text-dark">Banner Image URL</label>
-                            <input type="text" className="form-control mb-2" placeholder="https://images.unsplash.com/..." value={categoryForm.image} onChange={e => setCategoryForm({ ...categoryForm, image: e.target.value })} />
+                            <label className="form-label small fw-bold text-dark">Add Image by URL</label>
+                            <div className="d-flex gap-2 mb-2">
+                              <input
+                                type="text"
+                                className="form-control"
+                                placeholder="https://images.unsplash.com/..."
+                                value={categoryImageUrlInput}
+                                onChange={(e) => setCategoryImageUrlInput(e.target.value)}
+                              />
+                              <button
+                                type="button"
+                                className="btn btn-outline-success"
+                                onClick={handleAddCategoryImageByUrl}
+                              >
+                                Add URL
+                              </button>
+                            </div>
                             <div className="text-muted small text-center mb-2 fw-semibold">- OR -</div>
-                            <label className="form-label small fw-bold text-dark">Upload Image from Device</label>
-                            <input type="file" className="form-control" accept="image/*" onChange={handleImageUpload} />
-                            {categoryForm.image && (
+                            <label className="form-label small fw-bold text-dark">Upload Multiple Images from Device</label>
+                            <input
+                              type="file"
+                              className="form-control mb-3"
+                              accept="image/*"
+                              multiple
+                              onChange={handleImageUpload}
+                            />
+                            {categoryForm.images && categoryForm.images.length > 0 && (
                               <div className="mt-3">
-                                <span className="small text-muted d-block mb-1">Image Preview:</span>
-                                <img src={categoryForm.image} alt="Preview" className="img-thumbnail rounded" style={{ maxHeight: '140px', objectFit: 'cover' }} />
+                                <span className="small text-dark fw-bold d-block mb-2">Category Image Gallery:</span>
+                                <div className="row g-2">
+                                  {categoryForm.images.map((imgSrc, idx) => {
+                                    const isPrimary = categoryForm.image === imgSrc;
+                                    return (
+                                      <div className="col-4" key={idx}>
+                                        <div className="border rounded p-1 text-center bg-white position-relative" style={{ height: '110px' }}>
+                                          <img
+                                            src={imgSrc}
+                                            alt={`Preview ${idx}`}
+                                            className="img-fluid w-100 h-100 object-fit-cover rounded"
+                                          />
+                                          {isPrimary && (
+                                            <span className="position-absolute top-0 start-0 m-1 badge bg-success text-white small" style={{ zIndex: 2 }}>
+                                              Primary
+                                            </span>
+                                          )}
+                                          <div className="position-absolute bottom-0 end-0 m-1 d-flex gap-1" style={{ zIndex: 2 }}>
+                                            {!isPrimary && (
+                                              <button
+                                                type="button"
+                                                className="btn btn-success p-1 py-0 d-flex align-items-center justify-content-center"
+                                                style={{ width: '22px', height: '22px' }}
+                                                title="Set as primary banner"
+                                                onClick={() => setCategoryForm({ ...categoryForm, image: imgSrc })}
+                                              >
+                                                <i className="bi bi-star-fill" style={{ fontSize: '0.75rem' }}></i>
+                                              </button>
+                                            )}
+                                            <button
+                                              type="button"
+                                              className="btn btn-danger p-1 py-0 d-flex align-items-center justify-content-center"
+                                              style={{ width: '22px', height: '22px' }}
+                                              title="Delete image"
+                                              onClick={() => {
+                                                const filtered = categoryForm.images.filter((_, i) => i !== idx);
+                                                setCategoryForm({
+                                                  ...categoryForm,
+                                                  images: filtered,
+                                                  image: isPrimary ? (filtered[0] || '') : categoryForm.image,
+                                                });
+                                              }}
+                                            >
+                                              <i className="bi bi-trash" style={{ fontSize: '0.75rem' }}></i>
+                                            </button>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
                               </div>
                             )}
                           </div>
@@ -748,15 +882,85 @@ const AdminDashboard = () => {
                           
                           {/* Display Image URL or upload from Device */}
                           <div className="mb-3">
-                            <label className="form-label small fw-bold text-dark">Display Image URL</label>
-                            <input type="text" className="form-control mb-2" placeholder="https://images.unsplash.com/..." value={productForm.image} onChange={e => setProductForm({ ...productForm, image: e.target.value })} />
+                            <label className="form-label small fw-bold text-dark">Add Image by URL</label>
+                            <div className="d-flex gap-2 mb-2">
+                              <input
+                                type="text"
+                                className="form-control"
+                                placeholder="https://images.unsplash.com/..."
+                                value={productImageUrlInput}
+                                onChange={(e) => setProductImageUrlInput(e.target.value)}
+                              />
+                              <button
+                                type="button"
+                                className="btn btn-outline-success"
+                                onClick={handleAddProductImageByUrl}
+                              >
+                                Add URL
+                              </button>
+                            </div>
                             <div className="text-muted small text-center mb-2 fw-semibold">- OR -</div>
-                            <label className="form-label small fw-bold text-dark">Upload Image from Device</label>
-                            <input type="file" className="form-control" accept="image/*" onChange={handleProductImageUpload} />
-                            {productForm.image && (
+                            <label className="form-label small fw-bold text-dark">Upload Multiple Images from Device</label>
+                            <input
+                              type="file"
+                              className="form-control mb-3"
+                              accept="image/*"
+                              multiple
+                              onChange={handleProductImageUpload}
+                            />
+                            {productForm.images && productForm.images.length > 0 && (
                               <div className="mt-3">
-                                <span className="small text-muted d-block mb-1">Image Preview:</span>
-                                <img src={productForm.image} alt="Preview" className="img-thumbnail rounded" style={{ maxHeight: '140px', objectFit: 'cover' }} />
+                                <span className="small text-dark fw-bold d-block mb-2">Product Image Gallery:</span>
+                                <div className="row g-2">
+                                  {productForm.images.map((imgSrc, idx) => {
+                                    const isPrimary = productForm.image === imgSrc;
+                                    return (
+                                      <div className="col-4" key={idx}>
+                                        <div className="border rounded p-1 text-center bg-white position-relative" style={{ height: '110px' }}>
+                                          <img
+                                            src={imgSrc}
+                                            alt={`Preview ${idx}`}
+                                            className="img-fluid w-100 h-100 object-fit-cover rounded"
+                                          />
+                                          {isPrimary && (
+                                            <span className="position-absolute top-0 start-0 m-1 badge bg-success text-white small" style={{ zIndex: 2 }}>
+                                              Primary
+                                            </span>
+                                          )}
+                                          <div className="position-absolute bottom-0 end-0 m-1 d-flex gap-1" style={{ zIndex: 2 }}>
+                                            {!isPrimary && (
+                                              <button
+                                                type="button"
+                                                className="btn btn-success p-1 py-0 d-flex align-items-center justify-content-center"
+                                                style={{ width: '22px', height: '22px' }}
+                                                title="Set as main display image"
+                                                onClick={() => setProductForm({ ...productForm, image: imgSrc })}
+                                              >
+                                                <i className="bi bi-star-fill" style={{ fontSize: '0.75rem' }}></i>
+                                              </button>
+                                            )}
+                                            <button
+                                              type="button"
+                                              className="btn btn-danger p-1 py-0 d-flex align-items-center justify-content-center"
+                                              style={{ width: '22px', height: '22px' }}
+                                              title="Delete image"
+                                              onClick={() => {
+                                                const filtered = productForm.images.filter((_, i) => i !== idx);
+                                                setProductForm({
+                                                  ...productForm,
+                                                  images: filtered,
+                                                  image: isPrimary ? (filtered[0] || '') : productForm.image,
+                                                });
+                                              }}
+                                            >
+                                              <i className="bi bi-trash" style={{ fontSize: '0.75rem' }}></i>
+                                            </button>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
                               </div>
                             )}
                           </div>

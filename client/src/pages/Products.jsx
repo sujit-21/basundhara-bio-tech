@@ -20,6 +20,7 @@ const Products = () => {
 
   // Modals & Inquiry Form State
   const [activeProduct, setActiveProduct] = useState(null);
+  const [activeImage, setActiveImage] = useState('');
   const [showInquiryForm, setShowInquiryForm] = useState(false);
   const [inquiryData, setInquiryData] = useState({ name: '', email: '', subject: '', message: '' });
   const [inquiryLoading, setInquiryLoading] = useState(false);
@@ -151,6 +152,7 @@ const Products = () => {
 
   const openSpecsModal = (prod) => {
     setActiveProduct(prod);
+    setActiveImage(prod.image);
     setShowInquiryForm(false);
     setInquiryAlert({ show: false, message: '', type: 'success' });
   };
@@ -337,7 +339,26 @@ const Products = () => {
                     
                     <div className="row g-4">
                       <div className="col-md-5">
-                        <img src={activeProduct.image} alt={activeProduct.title} className="img-fluid rounded-3 object-fit-cover" style={{ maxHeight: '250px', width: '100%' }} />
+                        <img
+                          src={activeImage || activeProduct.image}
+                          alt={activeProduct.title}
+                          className="img-fluid rounded-3 object-fit-cover mb-2"
+                          style={{ height: '220px', width: '100%' }}
+                        />
+                        {activeProduct.images && activeProduct.images.length > 1 && (
+                          <div className="d-flex gap-2 overflow-x-auto py-1" style={{ scrollbarWidth: 'thin' }}>
+                            {activeProduct.images.map((imgSrc, idx) => (
+                              <img
+                                key={idx}
+                                src={imgSrc}
+                                alt={`Thumbnail ${idx}`}
+                                className={`img-thumbnail rounded object-fit-cover ${activeImage === imgSrc ? 'border-success border-2' : ''}`}
+                                style={{ width: '50px', height: '50px', cursor: 'pointer', opacity: activeImage === imgSrc ? 1 : 0.6, transition: 'all 0.2s ease' }}
+                                onClick={() => setActiveImage(imgSrc)}
+                              />
+                            ))}
+                          </div>
+                        )}
                       </div>
                       <div className="col-md-7">
                         <h6 className="science-font fw-bold text-success">Product Description</h6>

@@ -21,6 +21,10 @@ const categorySchema = new mongoose.Schema(
       type: String,
       default: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80&w=800&auto=format&fit=crop',
     },
+    images: {
+      type: [String],
+      default: [],
+    },
     subCategories: {
       type: [String],
       default: [],

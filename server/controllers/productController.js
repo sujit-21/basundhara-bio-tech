@@ -81,13 +81,14 @@ const getProductById = async (req, res, next) => {
 // @access  Private/Admin
 const createProduct = async (req, res, next) => {
   try {
-    const { title, description, price, image, category, subCategory, specifications, inStock } = req.body;
+    const { title, description, price, image, images, category, subCategory, specifications, inStock } = req.body;
 
     const product = new Product({
       title,
       description,
       price,
-      image,
+      image: image || (images && images.length > 0 ? images[0] : ''),
+      images: images || [],
       category,
       subCategory,
       specifications: typeof specifications === 'string' ? specifications.split(',').map(s => s.trim()) : specifications,
@@ -107,7 +108,7 @@ const createProduct = async (req, res, next) => {
 // @access  Private/Admin
 const updateProduct = async (req, res, next) => {
   try {
-    const { title, description, price, image, category, subCategory, specifications, inStock } = req.body;
+    const { title, description, price, image, images, category, subCategory, specifications, inStock } = req.body;
 
     const product = await Product.findById(req.params.id);
     if (!product) {
@@ -117,7 +118,8 @@ const updateProduct = async (req, res, next) => {
     product.title = title !== undefined ? title : product.title;
     product.description = description !== undefined ? description : product.description;
     product.price = price !== undefined ? price : product.price;
-    product.image = image !== undefined ? image : product.image;
+    product.images = images !== undefined ? images : product.images;
+    product.image = image !== undefined ? image : (product.images && product.images.length > 0 ? product.images[0] : '');
     product.category = category !== undefined ? category : product.category;
     product.subCategory = subCategory !== undefined ? subCategory : product.subCategory;
     product.inStock = inStock !== undefined ? inStock : product.inStock;

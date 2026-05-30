@@ -19,6 +19,10 @@ const productSchema = new mongoose.Schema(
       type: String,
       default: 'https://images.unsplash.com/photo-1592417817098-8f3d6eb19675?q=80&w=800&auto=format&fit=crop',
     },
+    images: {
+      type: [String],
+      default: [],
+    },
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Category',
