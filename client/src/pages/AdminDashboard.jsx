@@ -94,7 +94,8 @@ const AdminDashboard = () => {
       if (sustainabilityRes.data.success) setSustainability(sustainabilityRes.data.data);
     } catch (err) {
       console.error(err);
-      triggerAlert('Failed to synchronize system records.', 'danger');
+      const errMsg = err.response?.data?.message || err.message || 'Failed to synchronize system records.';
+      triggerAlert(`Failed to synchronize system records: ${errMsg}`, 'danger');
     } finally {
       setLoading(false);
     }
