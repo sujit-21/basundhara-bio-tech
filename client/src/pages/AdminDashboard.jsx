@@ -17,6 +17,7 @@ const AdminDashboard = () => {
   const [importExport, setImportExport] = useState([]);
   const [contacts, setContacts] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [aboutList, setAboutList] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orderSearch, setOrderSearch] = useState('');
   const [orderStatusFilter, setOrderStatusFilter] = useState('');
@@ -41,6 +42,7 @@ const AdminDashboard = () => {
   const [researchForm, setResearchForm] = useState({ title: '', abstract: '', authors: '', journal: '', publishDate: '', doi: '', pdfUrl: '/sample_research.pdf', category: 'Biofuels & Sustainability' });
   const [offices, setOffices] = useState([]);
   const [officeForm, setOfficeForm] = useState({ title: '', address: '', phone: '', email: '' });
+  const [aboutForm, setAboutForm] = useState({ name: '', role: '', qualification: '', bio: '', icon: 'bi-person', image: '' });
 
   const triggerAlert = (message, type = 'success') => {
     setAlertInfo({ show: true, message, type });
@@ -50,7 +52,7 @@ const AdminDashboard = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [statsRes, categoriesRes, productsRes, blogsRes, researchRes, ieRes, contactsRes, officesRes, ordersRes] = await Promise.all([
+      const [statsRes, categoriesRes, productsRes, blogsRes, researchRes, ieRes, contactsRes, officesRes, ordersRes, aboutRes] = await Promise.all([
         api.get('/analytics'),
         api.get('/categories'),
         api.get('/products?limit=100'),
@@ -60,6 +62,7 @@ const AdminDashboard = () => {
         api.get('/contacts?limit=100'),
         api.get('/offices'),
         api.get('/orders?limit=100'),
+        api.get('/about'),
       ]);
 
       if (statsRes.data.success) setStats(statsRes.data.data);
@@ -71,6 +74,7 @@ const AdminDashboard = () => {
       if (contactsRes.data.success) setContacts(contactsRes.data.data);
       if (officesRes.data.success) setOffices(officesRes.data.data);
       if (ordersRes.data.success) setOrders(ordersRes.data.data);
+      if (aboutRes.data.success) setAboutList(aboutRes.data.data);
     } catch (err) {
       console.error(err);
       triggerAlert('Failed to synchronize system records.', 'danger');
@@ -210,6 +214,24 @@ const AdminDashboard = () => {
     }
   };
 
+  // Submit About Member
+  const handleAboutSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (isEditMode) {
+        await api.put(`/about/${currentItem._id}`, aboutForm);
+        triggerAlert('About team member details updated.');
+      } else {
+        await api.post('/about', aboutForm);
+        triggerAlert('About team member registered successfully.');
+      }
+      setShowForm(false);
+      loadData();
+    } catch (err) {
+      triggerAlert(err.response?.data?.message || 'About member action failed.', 'danger');
+    }
+  };
+
   // Contact status change
   const handleContactStatusUpdate = async (id, status) => {
     try {
@@ -270,6 +292,8 @@ const AdminDashboard = () => {
       setResearchForm({ title: '', abstract: '', authors: 'Roy, B.', journal: 'Sustainable Agriculture Journal', publishDate: new Date().toISOString().split('T')[0], doi: '', pdfUrl: '/sample_research.pdf', category: 'Biofuels & Sustainability' });
     } else if (type === 'offices') {
       setOfficeForm({ title: '', address: '', phone: '', email: '' });
+    } else if (type === 'about') {
+      setAboutForm({ name: '', role: '', qualification: '', bio: '', icon: 'bi-person', image: '' });
     }
   };
 
@@ -293,6 +317,8 @@ const AdminDashboard = () => {
       setResearchForm({ title: item.title, abstract: item.abstract, authors: item.authors, journal: item.journal, publishDate: item.publishDate ? item.publishDate.split('T')[0] : '', doi: item.doi, pdfUrl: item.pdfUrl, category: item.category });
     } else if (type === 'offices') {
       setOfficeForm({ title: item.title, address: item.address, phone: item.phone, email: item.email });
+    } else if (type === 'about') {
+      setAboutForm({ name: item.name, role: item.role, qualification: item.qualification, bio: item.bio, icon: item.icon || 'bi-person', image: item.image || '' });
     }
   };
 
@@ -396,6 +422,18 @@ const AdminDashboard = () => {
     setProductImageUrlInput('');
   };
 
+  const handleAboutImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAboutForm((prev) => ({ ...prev, image: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+    e.target.value = '';
+  };
+
   return (
     <div className="admin-container text-start">
       <div className="container-fluid">
@@ -436,6 +474,9 @@ const AdminDashboard = () => {
               </button>
               <button onClick={() => { setActiveTab('offices'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent ${activeTab === 'offices' ? 'active' : ''}`}>
                 <i className="bi bi-geo-alt-fill me-2"></i> Trade Offices
+              </button>
+              <button onClick={() => { setActiveTab('about'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent ${activeTab === 'about' ? 'active' : ''}`}>
+                <i className="bi bi-info-circle-fill me-2"></i> About Us
               </button>
             </nav>
 
@@ -1495,6 +1536,114 @@ const AdminDashboard = () => {
                           </div>
                           <div className="d-flex gap-2">
                             <button type="submit" className="btn btn-success px-4">Save Specifications</button>
+                            <button type="button" onClick={() => setShowForm(false)} className="btn btn-secondary px-3">Cancel</button>
+                          </div>
+                        </form>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* --- TAB: MANAGE ABOUT MEMBERS --- */}
+                {activeTab === 'about' && (
+                  <div>
+                    {!showForm ? (
+                      <div>
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                          <h3 className="science-font fs-4 fw-bold">Corporate Leadership Team ({aboutList.length})</h3>
+                          <button onClick={() => openAddForm('about')} className="btn btn-sm btn-success">
+                            <i className="bi bi-plus-circle me-1"></i> Add Team Member
+                          </button>
+                        </div>
+                        <div className="table-responsive">
+                          <table className="table custom-table align-middle">
+                            <thead>
+                              <tr>
+                                <th>Photo / Icon</th>
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th>Qualification</th>
+                                <th>Bio</th>
+                                <th>Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {aboutList.map((m) => (
+                                <tr key={m._id}>
+                                  <td>
+                                    <div className="d-inline-flex justify-content-center align-items-center rounded bg-success bg-opacity-10 text-success overflow-hidden" style={{ width: '45px', height: '45px' }}>
+                                      {m.image ? (
+                                        <img src={m.image} alt={m.name} className="w-100 h-100 object-fit-cover" />
+                                      ) : (
+                                        <i className={`bi ${m.icon || 'bi-person'} fs-4`}></i>
+                                      )}
+                                    </div>
+                                  </td>
+                                  <td><span className="fw-semibold text-dark">{m.name}</span></td>
+                                  <td><span className="badge bg-success bg-opacity-10 text-success">{m.role}</span></td>
+                                  <td className="small text-muted" style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.qualification}</td>
+                                  <td className="small text-muted" style={{ maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.bio}</td>
+                                  <td>
+                                    <div className="d-flex gap-2">
+                                      <button onClick={() => openEditForm('about', m)} className="btn btn-xs btn-outline-primary py-1 px-2.5 small"><i className="bi bi-pencil-square"></i></button>
+                                      <button onClick={() => handleDelete('/about', m._id)} className="btn btn-xs btn-outline-danger py-1 px-2.5 small"><i className="bi bi-trash"></i></button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))}
+                              {aboutList.length === 0 && (
+                                <tr>
+                                  <td colSpan="6" className="text-center py-4 text-muted">No leadership team members registered yet.</td>
+                                </tr>
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    ) : (
+                      // Add/Edit Member Form
+                      <div className="card glass-card p-4 max-w-xl mx-auto text-start" style={{ maxWidth: '650px', margin: '0 auto' }}>
+                        <h4 className="science-font fw-bold mb-4">{isEditMode ? 'Modify Member Details' : 'Register New Team Member'}</h4>
+                        <form onSubmit={handleAboutSubmit}>
+                          <div className="row mb-3">
+                            <div className="col-md-6">
+                              <label className="form-label small fw-bold text-dark">Member Name</label>
+                              <input type="text" className="form-control" value={aboutForm.name} onChange={e => setAboutForm({ ...aboutForm, name: e.target.value })} required placeholder="e.g. Dr. Jane Doe" />
+                            </div>
+                            <div className="col-md-6">
+                              <label className="form-label small fw-bold text-dark">Corporate Role</label>
+                              <input type="text" className="form-control" value={aboutForm.role} onChange={e => setAboutForm({ ...aboutForm, role: e.target.value })} required placeholder="e.g. Chief Scientific Officer" />
+                            </div>
+                          </div>
+                          <div className="mb-3">
+                            <label className="form-label small fw-bold text-dark">Academic Qualifications / Experience</label>
+                            <input type="text" className="form-control" value={aboutForm.qualification} onChange={e => setAboutForm({ ...aboutForm, qualification: e.target.value })} required placeholder="e.g. PhD in Biochemistry (Oxford)" />
+                          </div>
+                          
+                          <div className="row mb-3">
+                            <div className="col-md-6">
+                              <label className="form-label small fw-bold text-dark">Bootstrap Icon Class (optional)</label>
+                              <input type="text" className="form-control" value={aboutForm.icon} onChange={e => setAboutForm({ ...aboutForm, icon: e.target.value })} placeholder="e.g. bi-person, bi-flower1" />
+                            </div>
+                            <div className="col-md-6">
+                              <label className="form-label small fw-bold text-dark">Upload Member Photo</label>
+                              <input type="file" className="form-control" accept="image/*" onChange={handleAboutImageUpload} />
+                            </div>
+                          </div>
+
+                          {aboutForm.image && (
+                            <div className="mb-3">
+                              <span className="small text-muted d-block mb-1">Photo Preview:</span>
+                              <img src={aboutForm.image} alt="Preview" className="img-thumbnail rounded-circle object-fit-cover" style={{ width: '90px', height: '90px' }} />
+                            </div>
+                          )}
+
+                          <div className="mb-4">
+                            <label className="form-label small fw-bold text-dark">Professional Bio Summary</label>
+                            <textarea className="form-control" rows="4" value={aboutForm.bio} onChange={e => setAboutForm({ ...aboutForm, bio: e.target.value })} required placeholder="Write a short summary of their achievements, research background, or operations scope..."></textarea>
+                          </div>
+                          <div className="d-flex gap-2">
+                            <button type="submit" className="btn btn-success px-4">Save Member Specs</button>
                             <button type="button" onClick={() => setShowForm(false)} className="btn btn-secondary px-3">Cancel</button>
                           </div>
                         </form>

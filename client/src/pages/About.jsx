@@ -1,27 +1,27 @@
+import { useEffect, useState } from 'react';
+import api from '../services/api';
+
 const About = () => {
-  const leadership = [
-    {
-      name: 'Dr. Basundhara Roy',
-      role: 'Founder & Managing Director',
-      qualification: 'PhD in Agriculture & Soil Metagenomics (IIT Kharagpur)',
-      bio: 'Pioneered organic microbial soil stimulants in India. Directs research in sustainable crop cultivation.',
-      icon: 'bi-flower1',
-    },
-    {
-      name: 'Dr. Elena Rostova',
-      role: 'Director of Sustainability & Circular Economy',
-      qualification: 'PhD in Bio-Resource Management (Freiburg University)',
-      bio: 'Oversees upcycling of agricultural residues and our bio-composting facility in West Bengal.',
-      icon: 'bi-recycle',
-    },
-    {
-      name: 'Ajeet Kumar',
-      role: 'Head of Global Logistics & Compliance',
-      qualification: 'MBA in International Trade (IIFT Delhi)',
-      bio: 'Manages international trade corridors, customs compliance, and phytosanitary certificate clearances.',
-      icon: 'bi-globe-asia-australia',
-    },
-  ];
+  const [leadership, setLeadership] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchLeadership = async () => {
+      try {
+        const res = await api.get('/about');
+        if (res.data.success) {
+          setLeadership(res.data.data);
+        }
+      } catch (err) {
+        console.error(err);
+        setError('Failed to load corporate leadership details.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLeadership();
+  }, []);
 
   return (
     <div className="about-container py-5 text-start">
@@ -118,8 +118,12 @@ const About = () => {
             {leadership.map((leader, i) => (
               <div className="col-lg-4 col-md-6" key={i}>
                 <div className="card glass-card h-100 p-4 border border-secondary border-opacity-10 text-center">
-                  <div className="bg-success bg-opacity-10 text-success rounded-circle p-3 d-inline-flex justify-content-center align-items-center mx-auto mb-3" style={{ width: '70px', height: '70px' }}>
-                    <i className={`bi ${leader.icon} fs-2`}></i>
+                  <div className="bg-success bg-opacity-10 text-success rounded-circle p-0 d-inline-flex justify-content-center align-items-center mx-auto mb-3 overflow-hidden" style={{ width: '70px', height: '70px' }}>
+                    {leader.image ? (
+                      <img src={leader.image} alt={leader.name} className="w-100 h-100 object-fit-cover" />
+                    ) : (
+                      <i className={`bi ${leader.icon || 'bi-person'} fs-2`}></i>
+                    )}
                   </div>
                   <h4 className="science-font fs-5 fw-bold text-dark">{leader.name}</h4>
                   <span className="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-1 mb-3 small science-font">{leader.role}</span>
