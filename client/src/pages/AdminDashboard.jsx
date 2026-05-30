@@ -19,6 +19,8 @@ const AdminDashboard = () => {
   const [orders, setOrders] = useState([]);
   const [aboutList, setAboutList] = useState([]);
   const [aboutSections, setAboutSections] = useState([]);
+  const [gallery, setGallery] = useState([]);
+  const [sustainability, setSustainability] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orderSearch, setOrderSearch] = useState('');
   const [orderStatusFilter, setOrderStatusFilter] = useState('');
@@ -46,6 +48,12 @@ const AdminDashboard = () => {
   const [aboutForm, setAboutForm] = useState({ name: '', role: '', qualification: '', bio: '', icon: 'bi-person', image: '' });
   const [aboutSectionForm, setAboutSectionForm] = useState({ type: 'vision_values', title: '', content: '', icon: '', year: '', color: 'success', order: 0 });
   const [aboutSubTab, setAboutSubTab] = useState('leadership');
+  
+  // Gallery & Sustainability forms
+  const [galleryForm, setGalleryForm] = useState({ title: '', description: '', category: 'Farms', images: [], order: 0 });
+  const [galleryImageUrlInput, setGalleryImageUrlInput] = useState('');
+  const [sustainabilityForm, setSustainabilityForm] = useState({ type: 'initiative', title: '', description: '', impact: '', icon: 'bi-recycle', order: 0 });
+  const [sustainabilitySubTab, setSustainabilitySubTab] = useState('hero');
 
   const triggerAlert = (message, type = 'success') => {
     setAlertInfo({ show: true, message, type });
@@ -55,7 +63,7 @@ const AdminDashboard = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [statsRes, categoriesRes, productsRes, blogsRes, researchRes, ieRes, contactsRes, officesRes, ordersRes, aboutRes, aboutSecRes] = await Promise.all([
+      const [statsRes, categoriesRes, productsRes, blogsRes, researchRes, ieRes, contactsRes, officesRes, ordersRes, aboutRes, aboutSecRes, galleryRes, sustainabilityRes] = await Promise.all([
         api.get('/analytics'),
         api.get('/categories'),
         api.get('/products?limit=100'),
@@ -67,6 +75,8 @@ const AdminDashboard = () => {
         api.get('/orders?limit=100'),
         api.get('/about'),
         api.get('/about-sections'),
+        api.get('/gallery'),
+        api.get('/sustainability'),
       ]);
 
       if (statsRes.data.success) setStats(statsRes.data.data);
@@ -80,6 +90,8 @@ const AdminDashboard = () => {
       if (ordersRes.data.success) setOrders(ordersRes.data.data);
       if (aboutRes.data.success) setAboutList(aboutRes.data.data);
       if (aboutSecRes.data.success) setAboutSections(aboutSecRes.data.data);
+      if (galleryRes.data.success) setGallery(galleryRes.data.data);
+      if (sustainabilityRes.data.success) setSustainability(sustainabilityRes.data.data);
     } catch (err) {
       console.error(err);
       triggerAlert('Failed to synchronize system records.', 'danger');
@@ -255,6 +267,83 @@ const AdminDashboard = () => {
     }
   };
 
+  // Submit Gallery Item
+  const handleGallerySubmit = async (e) => {
+    e.preventDefault();
+    if (!galleryForm.images || galleryForm.images.length === 0) {
+      triggerAlert('Please upload or link at least one image.', 'danger');
+      return;
+    }
+    try {
+      if (isEditMode) {
+        await api.put(`/gallery/${currentItem._id}`, galleryForm);
+        triggerAlert('Gallery item updated successfully.');
+      } else {
+        await api.post('/gallery', galleryForm);
+        triggerAlert('Gallery item added successfully.');
+      }
+      setShowForm(false);
+      loadData();
+    } catch (err) {
+      triggerAlert(err.response?.data?.message || 'Gallery item action failed.', 'danger');
+    }
+  };
+
+  // Submit Sustainability Item
+  const handleSustainabilitySubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (isEditMode) {
+        await api.put(`/sustainability/${currentItem._id}`, sustainabilityForm);
+        triggerAlert('Sustainability specifications updated.');
+      } else {
+        await api.post('/sustainability', sustainabilityForm);
+        triggerAlert('Sustainability item created successfully.');
+      }
+      setShowForm(false);
+      loadData();
+    } catch (err) {
+      triggerAlert(err.response?.data?.message || 'Sustainability action failed.', 'danger');
+    }
+  };
+
+  // Gallery multi image upload
+  const handleGalleryImageUpload = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    let loadedImages = [];
+    let count = 0;
+    files.forEach((file) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        loadedImages.push(reader.result);
+        count++;
+        if (count === files.length) {
+          setGalleryForm((prev) => {
+            const updatedImages = [...(prev.images || []), ...loadedImages];
+            return {
+              ...prev,
+              images: updatedImages,
+            };
+          });
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = '';
+  };
+
+  // Gallery add image by link
+  const handleAddGalleryImageByUrl = () => {
+    if (!galleryImageUrlInput.trim()) return;
+    setGalleryForm((prev) => ({
+      ...prev,
+      images: [...(prev.images || []), galleryImageUrlInput.trim()]
+    }));
+    setGalleryImageUrlInput('');
+  };
+
   // Contact status change
   const handleContactStatusUpdate = async (id, status) => {
     try {
@@ -319,6 +408,11 @@ const AdminDashboard = () => {
       setAboutForm({ name: '', role: '', qualification: '', bio: '', icon: 'bi-person', image: '' });
     } else if (type === 'about-section') {
       setAboutSectionForm({ type: extra || 'vision_values', title: '', content: '', icon: '', year: '', color: 'success', order: 0 });
+    } else if (type === 'gallery') {
+      setGalleryForm({ title: '', description: '', category: 'Farms', images: [], order: 0 });
+      setGalleryImageUrlInput('');
+    } else if (type === 'sustainability') {
+      setSustainabilityForm({ type: extra || 'initiative', title: '', description: '', impact: '', icon: 'bi-recycle', order: 0 });
     }
   };
 
@@ -346,6 +440,11 @@ const AdminDashboard = () => {
       setAboutForm({ name: item.name, role: item.role, qualification: item.qualification, bio: item.bio, icon: item.icon || 'bi-person', image: item.image || '' });
     } else if (type === 'about-section') {
       setAboutSectionForm({ type: item.type, title: item.title, content: item.content, icon: item.icon || '', year: item.year || '', color: item.color || 'success', order: item.order !== undefined ? item.order : 0 });
+    } else if (type === 'gallery') {
+      setGalleryForm({ title: item.title, description: item.description, category: item.category, images: item.images || (item.image ? [item.image] : []), order: item.order || 0 });
+      setGalleryImageUrlInput('');
+    } else if (type === 'sustainability') {
+      setSustainabilityForm({ type: item.type, title: item.title, description: item.description, impact: item.impact || '', icon: item.icon || 'bi-recycle', order: item.order || 0 });
     }
   };
 
@@ -504,6 +603,12 @@ const AdminDashboard = () => {
               </button>
               <button onClick={() => { setActiveTab('about'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent ${activeTab === 'about' ? 'active' : ''}`}>
                 <i className="bi bi-info-circle-fill me-2"></i> About Us
+              </button>
+              <button onClick={() => { setActiveTab('gallery'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent ${activeTab === 'gallery' ? 'active' : ''}`}>
+                <i className="bi bi-images me-2"></i> Gallery
+              </button>
+              <button onClick={() => { setActiveTab('sustainability'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent ${activeTab === 'sustainability' ? 'active' : ''}`}>
+                <i className="bi bi-recycle me-2"></i> Sustainability
               </button>
             </nav>
 
@@ -1825,6 +1930,331 @@ const AdminDashboard = () => {
                             </form>
                           </div>
                         )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* --- TAB: GALLERY --- */}
+                {activeTab === 'gallery' && (
+                  <div>
+                    {!showForm ? (
+                      <div>
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                          <h3 className="science-font fs-4 fw-bold">Operational Gallery ({gallery.length})</h3>
+                          <button onClick={() => openAddForm('gallery')} className="btn btn-sm btn-success">
+                            <i className="bi bi-plus-circle me-1"></i> Add Gallery Item
+                          </button>
+                        </div>
+                        <div className="table-responsive">
+                          <table className="table custom-table align-middle">
+                            <thead>
+                              <tr>
+                                <th>Thumbnail</th>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th>Images Count</th>
+                                <th>Order</th>
+                                <th>Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {gallery.map((g) => (
+                                <tr key={g._id}>
+                                  <td>
+                                    <div className="d-inline-flex justify-content-center align-items-center rounded bg-light border overflow-hidden" style={{ width: '55px', height: '40px' }}>
+                                      {g.images && g.images.length > 0 ? (
+                                        <img src={g.images[0]} alt={g.title} className="w-100 h-100 object-fit-cover" />
+                                      ) : (
+                                        <i className="bi bi-image text-muted fs-4"></i>
+                                      )}
+                                    </div>
+                                  </td>
+                                  <td><span className="fw-semibold text-dark">{g.title}</span></td>
+                                  <td><span className="badge bg-dark bg-opacity-75">{g.category}</span></td>
+                                  <td className="small text-muted" style={{ maxWidth: '280px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{g.description}</td>
+                                  <td><span className="badge bg-info bg-opacity-10 text-info fw-bold">{g.images?.length || 0} images</span></td>
+                                  <td className="font-monospace">{g.order}</td>
+                                  <td>
+                                    <div className="d-flex gap-2">
+                                      <button onClick={() => openEditForm('gallery', g)} className="btn btn-xs btn-outline-primary py-1 px-2.5 small"><i className="bi bi-pencil-square"></i></button>
+                                      <button onClick={() => handleDelete('/gallery', g._id)} className="btn btn-xs btn-outline-danger py-1 px-2.5 small"><i className="bi bi-trash"></i></button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))}
+                              {gallery.length === 0 && (
+                                <tr>
+                                  <td colSpan="7" className="text-center py-4 text-muted">No gallery items registered yet.</td>
+                                </tr>
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    ) : (
+                      // Add/Edit Gallery Form
+                      <div className="card glass-card p-4 max-w-xl mx-auto text-start" style={{ maxWidth: '700px', margin: '0 auto' }}>
+                        <h4 className="science-font fw-bold mb-4">{isEditMode ? 'Modify Gallery Item' : 'Add New Gallery Item'}</h4>
+                        <form onSubmit={handleGallerySubmit}>
+                          <div className="row mb-3">
+                            <div className="col-md-6">
+                              <label className="form-label small fw-bold text-dark">Item Title</label>
+                              <input type="text" className="form-control" value={galleryForm.title} onChange={e => setGalleryForm({ ...galleryForm, title: e.target.value })} required placeholder="e.g. Controlled Dehydration Chamber" />
+                            </div>
+                            <div className="col-md-6">
+                              <label className="form-label small fw-bold text-dark">Category Filter</label>
+                              <select className="form-select" value={galleryForm.category} onChange={e => setGalleryForm({ ...galleryForm, category: e.target.value })} required>
+                                <option value="Farms">Farms</option>
+                                <option value="Processing">Processing</option>
+                                <option value="Recycling">Recycling</option>
+                                <option value="Shipments">Shipments</option>
+                              </select>
+                            </div>
+                          </div>
+
+                          <div className="mb-3">
+                            <label className="form-label small fw-bold text-dark">Display Order (Sorting)</label>
+                            <input type="number" className="form-control" value={galleryForm.order} onChange={e => setGalleryForm({ ...galleryForm, order: Number(e.target.value) })} required />
+                          </div>
+
+                          <div className="mb-3">
+                            <label className="form-label small fw-bold text-dark">Description</label>
+                            <textarea className="form-control" rows="3" value={galleryForm.description} onChange={e => setGalleryForm({ ...galleryForm, description: e.target.value })} required placeholder="Short summary description of operations shown in the image..."></textarea>
+                          </div>
+
+                          {/* Image Multi-Selector */}
+                          <div className="mb-4 p-3 bg-light rounded-3 border">
+                            <label className="form-label small fw-bold text-success mb-2"><i className="bi bi-images me-1"></i>Image Assets Manager (Supports Multi-Upload)</label>
+                            
+                            <div className="row g-2 mb-3">
+                              <div className="col-md-6">
+                                <label className="form-label small text-muted">Option A: Upload files from device</label>
+                                <input type="file" className="form-control form-control-sm" accept="image/*" multiple onChange={handleGalleryImageUpload} />
+                              </div>
+                              <div className="col-md-6">
+                                <label className="form-label small text-muted">Option B: Load from web link/URL</label>
+                                <div className="input-group input-group-sm">
+                                  <input type="text" className="form-control" placeholder="https://domain.com/photo.jpg" value={galleryImageUrlInput} onChange={e => setGalleryImageUrlInput(e.target.value)} />
+                                  <button className="btn btn-outline-success" type="button" onClick={handleAddGalleryImageByUrl}>Add Link</button>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Images preview grid */}
+                            {galleryForm.images && galleryForm.images.length > 0 ? (
+                              <div>
+                                <span className="small text-muted d-block mb-2">Loaded Images ({galleryForm.images.length}) - Select a star to set primary thumbnail:</span>
+                                <div className="row row-cols-4 g-2">
+                                  {galleryForm.images.map((img, idx) => (
+                                    <div key={idx} className="col position-relative">
+                                      <div className="ratio ratio-4x3 border rounded bg-white overflow-hidden">
+                                        <img src={img} alt="Preview" className="w-100 h-100 object-fit-cover" />
+                                      </div>
+                                      {/* Star primary image toggle */}
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const filtered = galleryForm.images.filter(i => i !== img);
+                                          const reordered = [img, ...filtered];
+                                          setGalleryForm({ ...galleryForm, images: reordered });
+                                        }}
+                                        className={`btn btn-xs position-absolute top-2 start-2 p-1.5 rounded shadow-sm border-0 d-inline-flex justify-content-center align-items-center ${idx === 0 ? 'btn-warning' : 'btn-light bg-opacity-75'}`}
+                                        title={idx === 0 ? 'Primary Image (Active)' : 'Set as Primary Image'}
+                                        style={{ zIndex: 10, width: '22px', height: '22px' }}
+                                      >
+                                        <i className={`bi ${idx === 0 ? 'bi-star-fill text-dark' : 'bi-star'} small`}></i>
+                                      </button>
+                                      {/* Delete button */}
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const updated = galleryForm.images.filter((_, i) => i !== idx);
+                                          setGalleryForm({ ...galleryForm, images: updated });
+                                        }}
+                                        className="btn btn-xs btn-danger position-absolute top-2 end-2 p-1.5 rounded shadow-sm border-0 d-inline-flex justify-content-center align-items-center"
+                                        style={{ zIndex: 10, width: '22px', height: '22px' }}
+                                      >
+                                        <i className="bi bi-trash-fill small"></i>
+                                      </button>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="text-center py-3 text-muted small bg-white rounded border border-dashed">No images loaded yet. Please select files or add web links.</div>
+                            )}
+                          </div>
+
+                          <div className="d-flex gap-2">
+                            <button type="submit" className="btn btn-success px-4">Save Gallery Item</button>
+                            <button type="button" onClick={() => setShowForm(false)} className="btn btn-secondary px-3">Cancel</button>
+                          </div>
+                        </form>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* --- TAB: SUSTAINABILITY --- */}
+                {activeTab === 'sustainability' && (
+                  <div>
+                    {/* Inner Sub-Tabs Navigation */}
+                    <div className="d-flex gap-2 mb-4 border-bottom pb-2">
+                      <button
+                        type="button"
+                        className={`btn btn-sm rounded-pill px-3 py-1.5 fw-semibold ${sustainabilitySubTab === 'hero' ? 'btn-success text-white' : 'btn-light border border-secondary border-opacity-10 text-dark'}`}
+                        onClick={() => { setSustainabilitySubTab('hero'); setShowForm(false); }}
+                      >
+                        <i className="bi bi-window-sidebar me-1.5"></i> Hero Card
+                      </button>
+                      <button
+                        type="button"
+                        className={`btn btn-sm rounded-pill px-3 py-1.5 fw-semibold ${sustainabilitySubTab === 'initiative' ? 'btn-success text-white' : 'btn-light border border-secondary border-opacity-10 text-dark'}`}
+                        onClick={() => { setSustainabilitySubTab('initiative'); setShowForm(false); }}
+                      >
+                        <i className="bi bi-recycle me-1.5"></i> Circularity Initiatives
+                      </button>
+                    </div>
+
+                    {!showForm ? (
+                      <div>
+                        {sustainabilitySubTab === 'hero' ? (
+                          <div>
+                            <div className="d-flex justify-content-between align-items-center mb-3">
+                              <h4 className="science-font fs-5 fw-bold text-dark mb-0">Sustainability target (Hero) ({sustainability.filter(s => s.type === 'hero').length})</h4>
+                              {sustainability.filter(s => s.type === 'hero').length === 0 && (
+                                <button onClick={() => openAddForm('sustainability', 'hero')} className="btn btn-sm btn-success">
+                                  <i className="bi bi-plus-circle me-1"></i> Add Hero Target
+                                </button>
+                              )}
+                            </div>
+                            <div className="table-responsive">
+                              <table className="table custom-table align-middle">
+                                <thead>
+                                  <tr>
+                                    <th>Target Title</th>
+                                    <th>Main Description</th>
+                                    <th>Certification</th>
+                                    <th>Certification Icon</th>
+                                    <th>Actions</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {sustainability.filter(s => s.type === 'hero').map((h) => (
+                                    <tr key={h._id}>
+                                      <td><span className="fw-semibold text-dark">{h.title}</span></td>
+                                      <td className="small text-muted" style={{ maxWidth: '350px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{h.description}</td>
+                                      <td><span className="badge bg-success bg-opacity-10 text-success fw-bold">{h.impact || 'Zero Waste Certified'}</span></td>
+                                      <td className="font-monospace small text-dark"><i className={`bi ${h.icon || 'bi-shield-fill-check'} me-1.5`}></i>{h.icon || 'bi-shield-fill-check'}</td>
+                                      <td>
+                                        <div className="d-flex gap-2">
+                                          <button onClick={() => openEditForm('sustainability', h)} className="btn btn-xs btn-outline-primary py-1 px-2.5 small"><i className="bi bi-pencil-square"></i></button>
+                                          <button onClick={() => handleDelete('/sustainability', h._id)} className="btn btn-xs btn-outline-danger py-1 px-2.5 small"><i className="bi bi-trash"></i></button>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                  {sustainability.filter(s => s.type === 'hero').length === 0 && (
+                                    <tr>
+                                      <td colSpan="5" className="text-center py-4 text-muted">No Hero target configured yet. Add one to customize the Sustainability Page Header Card.</td>
+                                    </tr>
+                                  )}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        ) : (
+                          <div>
+                            <div className="d-flex justify-content-between align-items-center mb-3">
+                              <h4 className="science-font fs-5 fw-bold text-dark mb-0">Circularity Initiatives ({sustainability.filter(s => s.type === 'initiative').length})</h4>
+                              <button onClick={() => openAddForm('sustainability', 'initiative')} className="btn btn-sm btn-success">
+                                <i className="bi bi-plus-circle me-1"></i> Add Initiative Card
+                              </button>
+                            </div>
+                            <div className="table-responsive">
+                              <table className="table custom-table align-middle">
+                                <thead>
+                                  <tr>
+                                    <th>Icon</th>
+                                    <th>Initiative Title</th>
+                                    <th>Description Details</th>
+                                    <th>Impact Summary</th>
+                                    <th>Order</th>
+                                    <th>Actions</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {sustainability.filter(s => s.type === 'initiative').map((s) => (
+                                    <tr key={s._id}>
+                                      <td>
+                                        <div className="d-inline-flex justify-content-center align-items-center rounded bg-success bg-opacity-10 text-success p-2" style={{ width: '40px', height: '40px' }}>
+                                          <i className={`bi ${s.icon || 'bi-recycle'} fs-5`}></i>
+                                        </div>
+                                      </td>
+                                      <td><span className="fw-semibold text-dark">{s.title}</span></td>
+                                      <td className="small text-muted" style={{ maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.description}</td>
+                                      <td className="small fw-semibold text-success">{s.impact}</td>
+                                      <td className="font-monospace">{s.order}</td>
+                                      <td>
+                                        <div className="d-flex gap-2">
+                                          <button onClick={() => openEditForm('sustainability', s)} className="btn btn-xs btn-outline-primary py-1 px-2.5 small"><i className="bi bi-pencil-square"></i></button>
+                                          <button onClick={() => handleDelete('/sustainability', s._id)} className="btn btn-xs btn-outline-danger py-1 px-2.5 small"><i className="bi bi-trash"></i></button>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                  {sustainability.filter(s => s.type === 'initiative').length === 0 && (
+                                    <tr>
+                                      <td colSpan="6" className="text-center py-4 text-muted">No initiatives registered yet.</td>
+                                    </tr>
+                                  )}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      // Add/Edit Sustainability Form
+                      <div className="card glass-card p-4 max-w-xl mx-auto text-start" style={{ maxWidth: '650px', margin: '0 auto' }}>
+                        <h4 className="science-font fw-bold mb-4">
+                          {isEditMode ? 'Modify Sustainability specs' : 'Add Sustainability item'} ({sustainabilitySubTab === 'hero' ? 'Hero Card' : 'Initiative Card'})
+                        </h4>
+                        <form onSubmit={handleSustainabilitySubmit}>
+                          <div className="row mb-3">
+                            <div className="col-md-6">
+                              <label className="form-label small fw-bold text-dark">Title</label>
+                              <input type="text" className="form-control" value={sustainabilityForm.title} onChange={e => setSustainabilityForm({ ...sustainabilityForm, title: e.target.value })} required placeholder={sustainabilitySubTab === 'hero' ? "e.g. Our Goal: Zero Industrial Agro-Waste" : "e.g. Agricultural Coir Upcycling"} />
+                            </div>
+                            <div className="col-md-6">
+                              <label className="form-label small fw-bold text-dark">Bootstrap Icon Class</label>
+                              <input type="text" className="form-control" value={sustainabilityForm.icon} onChange={e => setSustainabilityForm({ ...sustainabilityForm, icon: e.target.value })} required placeholder="e.g. bi-recycle, bi-sun-fill, bi-shield-fill-check" />
+                            </div>
+                          </div>
+
+                          <div className="row mb-3">
+                            <div className="col-md-6">
+                              <label className="form-label small fw-bold text-dark">{sustainabilitySubTab === 'hero' ? "Certification text" : "Impact statement"}</label>
+                              <input type="text" className="form-control" value={sustainabilityForm.impact} onChange={e => setSustainabilityForm({ ...sustainabilityForm, impact: e.target.value })} required placeholder={sustainabilitySubTab === 'hero' ? "e.g. Zero Waste Certified" : "e.g. 120 Metric Tons of husk waste diverted annually"} />
+                            </div>
+                            <div className="col-md-6">
+                              <label className="form-label small fw-bold text-dark">Display Order (Sorting)</label>
+                              <input type="number" className="form-control" value={sustainabilityForm.order} onChange={e => setSustainabilityForm({ ...sustainabilityForm, order: Number(e.target.value) })} required />
+                            </div>
+                          </div>
+
+                          <div className="mb-4">
+                            <label className="form-label small fw-bold text-dark">Detailed Description content</label>
+                            <textarea className="form-control" rows="4" value={sustainabilityForm.description} onChange={e => setSustainabilityForm({ ...sustainabilityForm, description: e.target.value })} required placeholder="Write the main description details here..."></textarea>
+                          </div>
+
+                          <div className="d-flex gap-2">
+                            <button type="submit" className="btn btn-success px-4">Save Specifications</button>
+                            <button type="button" onClick={() => setShowForm(false)} className="btn btn-secondary px-3">Cancel</button>
+                          </div>
+                        </form>
                       </div>
                     )}
                   </div>
