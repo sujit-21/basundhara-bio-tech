@@ -17,6 +17,7 @@ const analyticsRoutes = require('./routes/analyticsRoutes');
 const officeRoutes = require('./routes/officeRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const aboutRoutes = require('./routes/aboutRoutes');
+const aboutSectionRoutes = require('./routes/aboutSectionRoutes');
 
 // Load environment variables
 dotenv.config();
@@ -25,6 +26,8 @@ dotenv.config();
 connectDB().then(() => {
   const seedAbout = require('./utils/seedAbout');
   seedAbout();
+  const seedAboutSections = require('./utils/seedAboutSections');
+  seedAboutSections();
 });
 
 const app = express();
@@ -66,6 +69,7 @@ app.use(['/api/analytics', '/analytics'], analyticsRoutes);
 app.use(['/api/offices', '/offices'], officeRoutes);
 app.use(['/api/orders', '/orders'], orderRoutes);
 app.use(['/api/about', '/about'], aboutRoutes);
+app.use(['/api/about-sections', '/about-sections'], aboutSectionRoutes);
 
 // Simple Welcome Route
 app.get('/', (req, res) => {

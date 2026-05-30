@@ -18,6 +18,7 @@ const AdminDashboard = () => {
   const [contacts, setContacts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [aboutList, setAboutList] = useState([]);
+  const [aboutSections, setAboutSections] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orderSearch, setOrderSearch] = useState('');
   const [orderStatusFilter, setOrderStatusFilter] = useState('');
@@ -43,6 +44,8 @@ const AdminDashboard = () => {
   const [offices, setOffices] = useState([]);
   const [officeForm, setOfficeForm] = useState({ title: '', address: '', phone: '', email: '' });
   const [aboutForm, setAboutForm] = useState({ name: '', role: '', qualification: '', bio: '', icon: 'bi-person', image: '' });
+  const [aboutSectionForm, setAboutSectionForm] = useState({ type: 'vision_values', title: '', content: '', icon: '', year: '', color: 'success', order: 0 });
+  const [aboutSubTab, setAboutSubTab] = useState('leadership');
 
   const triggerAlert = (message, type = 'success') => {
     setAlertInfo({ show: true, message, type });
@@ -52,7 +55,7 @@ const AdminDashboard = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [statsRes, categoriesRes, productsRes, blogsRes, researchRes, ieRes, contactsRes, officesRes, ordersRes, aboutRes] = await Promise.all([
+      const [statsRes, categoriesRes, productsRes, blogsRes, researchRes, ieRes, contactsRes, officesRes, ordersRes, aboutRes, aboutSecRes] = await Promise.all([
         api.get('/analytics'),
         api.get('/categories'),
         api.get('/products?limit=100'),
@@ -63,6 +66,7 @@ const AdminDashboard = () => {
         api.get('/offices'),
         api.get('/orders?limit=100'),
         api.get('/about'),
+        api.get('/about-sections'),
       ]);
 
       if (statsRes.data.success) setStats(statsRes.data.data);
@@ -75,6 +79,7 @@ const AdminDashboard = () => {
       if (officesRes.data.success) setOffices(officesRes.data.data);
       if (ordersRes.data.success) setOrders(ordersRes.data.data);
       if (aboutRes.data.success) setAboutList(aboutRes.data.data);
+      if (aboutSecRes.data.success) setAboutSections(aboutSecRes.data.data);
     } catch (err) {
       console.error(err);
       triggerAlert('Failed to synchronize system records.', 'danger');
@@ -232,6 +237,24 @@ const AdminDashboard = () => {
     }
   };
 
+  // Submit About Section
+  const handleAboutSectionSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (isEditMode) {
+        await api.put(`/about-sections/${currentItem._id}`, aboutSectionForm);
+        triggerAlert('About section specifications updated.');
+      } else {
+        await api.post('/about-sections', aboutSectionForm);
+        triggerAlert('About section created successfully.');
+      }
+      setShowForm(false);
+      loadData();
+    } catch (err) {
+      triggerAlert(err.response?.data?.message || 'About section action failed.', 'danger');
+    }
+  };
+
   // Contact status change
   const handleContactStatusUpdate = async (id, status) => {
     try {
@@ -272,7 +295,7 @@ const AdminDashboard = () => {
   };
 
   // Form opening helpers
-  const openAddForm = (type) => {
+  const openAddForm = (type, extra = null) => {
     setIsEditMode(false);
     setCurrentItem(null);
     setShowForm(true);
@@ -294,6 +317,8 @@ const AdminDashboard = () => {
       setOfficeForm({ title: '', address: '', phone: '', email: '' });
     } else if (type === 'about') {
       setAboutForm({ name: '', role: '', qualification: '', bio: '', icon: 'bi-person', image: '' });
+    } else if (type === 'about-section') {
+      setAboutSectionForm({ type: extra || 'vision_values', title: '', content: '', icon: '', year: '', color: 'success', order: 0 });
     }
   };
 
@@ -319,6 +344,8 @@ const AdminDashboard = () => {
       setOfficeForm({ title: item.title, address: item.address, phone: item.phone, email: item.email });
     } else if (type === 'about') {
       setAboutForm({ name: item.name, role: item.role, qualification: item.qualification, bio: item.bio, icon: item.icon || 'bi-person', image: item.image || '' });
+    } else if (type === 'about-section') {
+      setAboutSectionForm({ type: item.type, title: item.title, content: item.content, icon: item.icon || '', year: item.year || '', color: item.color || 'success', order: item.order !== undefined ? item.order : 0 });
     }
   };
 
@@ -1544,109 +1571,260 @@ const AdminDashboard = () => {
                   </div>
                 )}
 
-                {/* --- TAB: MANAGE ABOUT MEMBERS --- */}
+                {/* --- TAB: MANAGE ABOUT SECTIONS --- */}
                 {activeTab === 'about' && (
                   <div>
+                    {/* Inner Sub-Tabs Navigation */}
+                    <div className="d-flex gap-2 mb-4 border-bottom pb-2">
+                      <button
+                        type="button"
+                        className={`btn btn-sm rounded-pill px-3 py-1.5 fw-semibold ${aboutSubTab === 'leadership' ? 'btn-success text-white' : 'btn-light border border-secondary border-opacity-10 text-dark'}`}
+                        onClick={() => { setAboutSubTab('leadership'); setShowForm(false); }}
+                      >
+                        <i className="bi bi-people-fill me-1.5"></i> Leadership Team
+                      </button>
+                      <button
+                        type="button"
+                        className={`btn btn-sm rounded-pill px-3 py-1.5 fw-semibold ${aboutSubTab === 'vision_values' ? 'btn-success text-white' : 'btn-light border border-secondary border-opacity-10 text-dark'}`}
+                        onClick={() => { setAboutSubTab('vision_values'); setShowForm(false); }}
+                      >
+                        <i className="bi bi-eye-fill me-1.5"></i> Vision & Values
+                      </button>
+                      <button
+                        type="button"
+                        className={`btn btn-sm rounded-pill px-3 py-1.5 fw-semibold ${aboutSubTab === 'history' ? 'btn-success text-white' : 'btn-light border border-secondary border-opacity-10 text-dark'}`}
+                        onClick={() => { setAboutSubTab('history'); setShowForm(false); }}
+                      >
+                        <i className="bi bi-clock-history me-1.5"></i> History Timeline
+                      </button>
+                      <button
+                        type="button"
+                        className={`btn btn-sm rounded-pill px-3 py-1.5 fw-semibold ${aboutSubTab === 'facility' ? 'btn-success text-white' : 'btn-light border border-secondary border-opacity-10 text-dark'}`}
+                        onClick={() => { setAboutSubTab('facility'); setShowForm(false); }}
+                      >
+                        <i className="bi bi-geo-alt-fill me-1.5"></i> Operating Coordinates
+                      </button>
+                    </div>
+
                     {!showForm ? (
                       <div>
-                        <div className="d-flex justify-content-between align-items-center mb-3">
-                          <h3 className="science-font fs-4 fw-bold">Corporate Leadership Team ({aboutList.length})</h3>
-                          <button onClick={() => openAddForm('about')} className="btn btn-sm btn-success">
-                            <i className="bi bi-plus-circle me-1"></i> Add Team Member
-                          </button>
-                        </div>
-                        <div className="table-responsive">
-                          <table className="table custom-table align-middle">
-                            <thead>
-                              <tr>
-                                <th>Photo / Icon</th>
-                                <th>Name</th>
-                                <th>Role</th>
-                                <th>Qualification</th>
-                                <th>Bio</th>
-                                <th>Actions</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {aboutList.map((m) => (
-                                <tr key={m._id}>
-                                  <td>
-                                    <div className="d-inline-flex justify-content-center align-items-center rounded bg-success bg-opacity-10 text-success overflow-hidden" style={{ width: '45px', height: '45px' }}>
-                                      {m.image ? (
-                                        <img src={m.image} alt={m.name} className="w-100 h-100 object-fit-cover" />
-                                      ) : (
-                                        <i className={`bi ${m.icon || 'bi-person'} fs-4`}></i>
-                                      )}
-                                    </div>
-                                  </td>
-                                  <td><span className="fw-semibold text-dark">{m.name}</span></td>
-                                  <td><span className="badge bg-success bg-opacity-10 text-success">{m.role}</span></td>
-                                  <td className="small text-muted" style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.qualification}</td>
-                                  <td className="small text-muted" style={{ maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.bio}</td>
-                                  <td>
-                                    <div className="d-flex gap-2">
-                                      <button onClick={() => openEditForm('about', m)} className="btn btn-xs btn-outline-primary py-1 px-2.5 small"><i className="bi bi-pencil-square"></i></button>
-                                      <button onClick={() => handleDelete('/about', m._id)} className="btn btn-xs btn-outline-danger py-1 px-2.5 small"><i className="bi bi-trash"></i></button>
-                                    </div>
-                                  </td>
-                                </tr>
-                              ))}
-                              {aboutList.length === 0 && (
-                                <tr>
-                                  <td colSpan="6" className="text-center py-4 text-muted">No leadership team members registered yet.</td>
-                                </tr>
-                              )}
-                            </tbody>
-                          </table>
-                        </div>
+                        {aboutSubTab === 'leadership' ? (
+                          <div>
+                            <div className="d-flex justify-content-between align-items-center mb-3">
+                              <h4 className="science-font fs-5 fw-bold text-dark mb-0">Corporate Leadership Team ({aboutList.length})</h4>
+                              <button onClick={() => openAddForm('about')} className="btn btn-sm btn-success">
+                                <i className="bi bi-plus-circle me-1"></i> Add Team Member
+                              </button>
+                            </div>
+                            <div className="table-responsive">
+                              <table className="table custom-table align-middle">
+                                <thead>
+                                  <tr>
+                                    <th>Photo / Icon</th>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Qualification</th>
+                                    <th>Bio</th>
+                                    <th>Actions</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {aboutList.map((m) => (
+                                    <tr key={m._id}>
+                                      <td>
+                                        <div className="d-inline-flex justify-content-center align-items-center rounded bg-success bg-opacity-10 text-success overflow-hidden" style={{ width: '45px', height: '45px' }}>
+                                          {m.image ? (
+                                            <img src={m.image} alt={m.name} className="w-100 h-100 object-fit-cover" />
+                                          ) : (
+                                            <i className={`bi ${m.icon || 'bi-person'} fs-4`}></i>
+                                          )}
+                                        </div>
+                                      </td>
+                                      <td><span className="fw-semibold text-dark">{m.name}</span></td>
+                                      <td><span className="badge bg-success bg-opacity-10 text-success">{m.role}</span></td>
+                                      <td className="small text-muted" style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.qualification}</td>
+                                      <td className="small text-muted" style={{ maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.bio}</td>
+                                      <td>
+                                        <div className="d-flex gap-2">
+                                          <button onClick={() => openEditForm('about', m)} className="btn btn-xs btn-outline-primary py-1 px-2.5 small"><i className="bi bi-pencil-square"></i></button>
+                                          <button onClick={() => handleDelete('/about', m._id)} className="btn btn-xs btn-outline-danger py-1 px-2.5 small"><i className="bi bi-trash"></i></button>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                  {aboutList.length === 0 && (
+                                    <tr>
+                                      <td colSpan="6" className="text-center py-4 text-muted">No leadership team members registered yet.</td>
+                                    </tr>
+                                  )}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        ) : (
+                          <div>
+                            <div className="d-flex justify-content-between align-items-center mb-3">
+                              <h4 className="science-font fs-5 fw-bold text-capitalize text-dark mb-0">
+                                {aboutSubTab.replace('_', ' & ')} Sections ({aboutSections.filter(s => s.type === aboutSubTab).length})
+                              </h4>
+                              <button onClick={() => openAddForm('about-section', aboutSubTab)} className="btn btn-sm btn-success">
+                                <i className="bi bi-plus-circle me-1"></i> Add Section Item
+                              </button>
+                            </div>
+                            <div className="table-responsive">
+                              <table className="table custom-table align-middle">
+                                <thead>
+                                  <tr>
+                                    {aboutSubTab === 'history' && <th>Year</th>}
+                                    {aboutSubTab !== 'history' && <th>Icon</th>}
+                                    <th>Title</th>
+                                    <th>Content Details</th>
+                                    <th>Theme Color</th>
+                                    <th>Order</th>
+                                    <th>Actions</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {aboutSections
+                                    .filter((s) => s.type === aboutSubTab)
+                                    .map((s) => (
+                                      <tr key={s._id}>
+                                        {aboutSubTab === 'history' && <td className="fw-bold font-monospace">{s.year}</td>}
+                                        {aboutSubTab !== 'history' && (
+                                          <td>
+                                            <div className="d-inline-flex justify-content-center align-items-center rounded bg-light border p-2" style={{ width: '40px', height: '40px' }}>
+                                              <i className={`bi ${s.icon || 'bi-gear'} fs-5 text-${s.color || 'success'}`}></i>
+                                            </div>
+                                          </td>
+                                        )}
+                                        <td><span className="fw-semibold text-dark">{s.title}</span></td>
+                                        <td className="small text-muted" style={{ maxWidth: '350px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.content}</td>
+                                        <td><span className={`badge bg-${s.color || 'success'}`}>{s.color}</span></td>
+                                        <td className="font-monospace">{s.order}</td>
+                                        <td>
+                                          <div className="d-flex gap-2">
+                                            <button onClick={() => openEditForm('about-section', s)} className="btn btn-xs btn-outline-primary py-1 px-2.5 small"><i className="bi bi-pencil-square"></i></button>
+                                            <button onClick={() => handleDelete('/about-sections', s._id)} className="btn btn-xs btn-outline-danger py-1 px-2.5 small"><i className="bi bi-trash"></i></button>
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  {aboutSections.filter(s => s.type === aboutSubTab).length === 0 && (
+                                    <tr>
+                                      <td colSpan="7" className="text-center py-4 text-muted">No items registered for this section yet.</td>
+                                    </tr>
+                                  )}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ) : (
-                      // Add/Edit Member Form
-                      <div className="card glass-card p-4 max-w-xl mx-auto text-start" style={{ maxWidth: '650px', margin: '0 auto' }}>
-                        <h4 className="science-font fw-bold mb-4">{isEditMode ? 'Modify Member Details' : 'Register New Team Member'}</h4>
-                        <form onSubmit={handleAboutSubmit}>
-                          <div className="row mb-3">
-                            <div className="col-md-6">
-                              <label className="form-label small fw-bold text-dark">Member Name</label>
-                              <input type="text" className="form-control" value={aboutForm.name} onChange={e => setAboutForm({ ...aboutForm, name: e.target.value })} required placeholder="e.g. Dr. Jane Doe" />
-                            </div>
-                            <div className="col-md-6">
-                              <label className="form-label small fw-bold text-dark">Corporate Role</label>
-                              <input type="text" className="form-control" value={aboutForm.role} onChange={e => setAboutForm({ ...aboutForm, role: e.target.value })} required placeholder="e.g. Chief Scientific Officer" />
-                            </div>
-                          </div>
-                          <div className="mb-3">
-                            <label className="form-label small fw-bold text-dark">Academic Qualifications / Experience</label>
-                            <input type="text" className="form-control" value={aboutForm.qualification} onChange={e => setAboutForm({ ...aboutForm, qualification: e.target.value })} required placeholder="e.g. PhD in Biochemistry (Oxford)" />
-                          </div>
-                          
-                          <div className="row mb-3">
-                            <div className="col-md-6">
-                              <label className="form-label small fw-bold text-dark">Bootstrap Icon Class (optional)</label>
-                              <input type="text" className="form-control" value={aboutForm.icon} onChange={e => setAboutForm({ ...aboutForm, icon: e.target.value })} placeholder="e.g. bi-person, bi-flower1" />
-                            </div>
-                            <div className="col-md-6">
-                              <label className="form-label small fw-bold text-dark">Upload Member Photo</label>
-                              <input type="file" className="form-control" accept="image/*" onChange={handleAboutImageUpload} />
-                            </div>
-                          </div>
+                      // Form Modes
+                      <div>
+                        {aboutSubTab !== 'leadership' ? (
+                          // Add/Edit AboutSection Form
+                          <div className="card glass-card p-4 max-w-xl mx-auto text-start" style={{ maxWidth: '650px', margin: '0 auto' }}>
+                            <h4 className="science-font fw-bold mb-4">
+                              {isEditMode ? 'Modify Section Details' : 'Add New Section Item'} ({aboutSubTab.replace('_', ' & ')})
+                            </h4>
+                            <form onSubmit={handleAboutSectionSubmit}>
+                              <div className="row mb-3">
+                                <div className="col-md-6">
+                                  <label className="form-label small fw-bold text-dark">Item Title</label>
+                                  <input type="text" className="form-control" value={aboutSectionForm.title} onChange={e => setAboutSectionForm({ ...aboutSectionForm, title: e.target.value })} required placeholder="e.g. Our Vision, Processing Unit I..." />
+                                </div>
+                                <div className="col-md-6">
+                                  <label className="form-label small fw-bold text-dark">Theme Color</label>
+                                  <select className="form-select" value={aboutSectionForm.color} onChange={e => setAboutSectionForm({ ...aboutSectionForm, color: e.target.value })}>
+                                    <option value="success">Success (Green)</option>
+                                    <option value="primary">Primary (Blue)</option>
+                                    <option value="warning">Warning (Yellow)</option>
+                                    <option value="danger">Danger (Red)</option>
+                                    <option value="secondary">Secondary (Gray)</option>
+                                  </select>
+                                </div>
+                              </div>
 
-                          {aboutForm.image && (
-                            <div className="mb-3">
-                              <span className="small text-muted d-block mb-1">Photo Preview:</span>
-                              <img src={aboutForm.image} alt="Preview" className="img-thumbnail rounded-circle object-fit-cover" style={{ width: '90px', height: '90px' }} />
-                            </div>
-                          )}
+                              <div className="row mb-3">
+                                {aboutSubTab === 'history' ? (
+                                  <div className="col-md-6">
+                                    <label className="form-label small fw-bold text-dark">Timeline Year</label>
+                                    <input type="text" className="form-control" value={aboutSectionForm.year} onChange={e => setAboutSectionForm({ ...aboutSectionForm, year: e.target.value })} required placeholder="e.g. 2020, 2026" />
+                                  </div>
+                                ) : (
+                                  <div className="col-md-6">
+                                    <label className="form-label small fw-bold text-dark">Bootstrap Icon Class</label>
+                                    <input type="text" className="form-control" value={aboutSectionForm.icon} onChange={e => setAboutSectionForm({ ...aboutSectionForm, icon: e.target.value })} required placeholder="e.g. bi-eye, bi-recycle, bi-egg-fried" />
+                                  </div>
+                                )}
+                                <div className="col-md-6">
+                                  <label className="form-label small fw-bold text-dark">Display Order (Sorting)</label>
+                                  <input type="number" className="form-control" value={aboutSectionForm.order} onChange={e => setAboutSectionForm({ ...aboutSectionForm, order: Number(e.target.value) })} required />
+                                </div>
+                              </div>
 
-                          <div className="mb-4">
-                            <label className="form-label small fw-bold text-dark">Professional Bio Summary</label>
-                            <textarea className="form-control" rows="4" value={aboutForm.bio} onChange={e => setAboutForm({ ...aboutForm, bio: e.target.value })} required placeholder="Write a short summary of their achievements, research background, or operations scope..."></textarea>
+                              <div className="mb-4">
+                                <label className="form-label small fw-bold text-dark">Section Description / Content Details</label>
+                                <textarea className="form-control" rows="4" value={aboutSectionForm.content} onChange={e => setAboutSectionForm({ ...aboutSectionForm, content: e.target.value })} required placeholder="Write the detailed text description here..."></textarea>
+                              </div>
+
+                              <div className="d-flex gap-2">
+                                <button type="submit" className="btn btn-success px-4">Save Section Specs</button>
+                                <button type="button" onClick={() => setShowForm(false)} className="btn btn-secondary px-3">Cancel</button>
+                              </div>
+                            </form>
                           </div>
-                          <div className="d-flex gap-2">
-                            <button type="submit" className="btn btn-success px-4">Save Member Specs</button>
-                            <button type="button" onClick={() => setShowForm(false)} className="btn btn-secondary px-3">Cancel</button>
+                        ) : (
+                          // Add/Edit Member Form
+                          <div className="card glass-card p-4 max-w-xl mx-auto text-start" style={{ maxWidth: '650px', margin: '0 auto' }}>
+                            <h4 className="science-font fw-bold mb-4">{isEditMode ? 'Modify Member Details' : 'Register New Team Member'}</h4>
+                            <form onSubmit={handleAboutSubmit}>
+                              <div className="row mb-3">
+                                <div className="col-md-6">
+                                  <label className="form-label small fw-bold text-dark">Member Name</label>
+                                  <input type="text" className="form-control" value={aboutForm.name} onChange={e => setAboutForm({ ...aboutForm, name: e.target.value })} required placeholder="e.g. Dr. Jane Doe" />
+                                </div>
+                                <div className="col-md-6">
+                                  <label className="form-label small fw-bold text-dark">Corporate Role</label>
+                                  <input type="text" className="form-control" value={aboutForm.role} onChange={e => setAboutForm({ ...aboutForm, role: e.target.value })} required placeholder="e.g. Chief Scientific Officer" />
+                                </div>
+                              </div>
+                              <div className="mb-3">
+                                <label className="form-label small fw-bold text-dark">Academic Qualifications / Experience</label>
+                                <input type="text" className="form-control" value={aboutForm.qualification} onChange={e => setAboutForm({ ...aboutForm, qualification: e.target.value })} required placeholder="e.g. PhD in Biochemistry (Oxford)" />
+                              </div>
+                              
+                              <div className="row mb-3">
+                                <div className="col-md-6">
+                                  <label className="form-label small fw-bold text-dark">Bootstrap Icon Class (optional)</label>
+                                  <input type="text" className="form-control" value={aboutForm.icon} onChange={e => setAboutForm({ ...aboutForm, icon: e.target.value })} placeholder="e.g. bi-person, bi-flower1" />
+                                </div>
+                                <div className="col-md-6">
+                                  <label className="form-label small fw-bold text-dark">Upload Member Photo</label>
+                                  <input type="file" className="form-control" accept="image/*" onChange={handleAboutImageUpload} />
+                                </div>
+                              </div>
+
+                              {aboutForm.image && (
+                                <div className="mb-3">
+                                  <span className="small text-muted d-block mb-1">Photo Preview:</span>
+                                  <img src={aboutForm.image} alt="Preview" className="img-thumbnail rounded-circle object-fit-cover" style={{ width: '90px', height: '90px' }} />
+                                </div>
+                              )}
+
+                              <div className="mb-4">
+                                <label className="form-label small fw-bold text-dark">Professional Bio Summary</label>
+                                <textarea className="form-control" rows="4" value={aboutForm.bio} onChange={e => setAboutForm({ ...aboutForm, bio: e.target.value })} required placeholder="Write a short summary of their achievements, research background, or operations scope..."></textarea>
+                              </div>
+                              <div className="d-flex gap-2">
+                                <button type="submit" className="btn btn-success px-4">Save Member Specs</button>
+                                <button type="button" onClick={() => setShowForm(false)} className="btn btn-secondary px-3">Cancel</button>
+                              </div>
+                            </form>
                           </div>
-                        </form>
+                        )}
                       </div>
                     )}
                   </div>
