@@ -1,15 +1,15 @@
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
+  --text: #6e7f73;
+  --text-h: #395886;
+  --bg: #f2f2f0;
+  --border: #c4cfc7;
+  --code-bg: #D5DEEF;
+  --accent: #628ECB;
+  --accent-bg: rgba(98, 142, 203, 0.1);
+  --accent-border: rgba(98, 142, 203, 0.5);
+  --social-bg: rgba(196, 207, 199, 0.5);
   --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+    rgba(57, 88, 134, 0.1) 0 10px 15px -3px, rgba(57, 88, 134, 0.05) 0 4px 6px -2px;
 
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
   --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
@@ -32,19 +32,32 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
+    --text: #f2f2f0;
+    --text-h: #ffffff;
+    --bg: #000000;
+    --border: #395886;
+    --code-bg: #111111;
+    --accent: #628ECB;
+    --accent-bg: rgba(98, 142, 203, 0.15);
+    --accent-border: rgba(98, 142, 203, 0.5);
+    --social-bg: rgba(255, 255, 255, 0.1);
     --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+      rgba(255, 255, 255, 0.05) 0 10px 15px -3px, rgba(255, 255, 255, 0.02) 0 4px 6px -2px;
   }
 
+  .bg-white, .bg-light, .card, .modal-content, .offcanvas, .dropdown-menu {
+    background-color: #111111 !important;
+    border-color: var(--border) !important;
+    color: var(--text) !important;
+  }
+
+  .text-muted {
+    color: #a0a0a0 !important;
+  }
+
+  .border, .border-bottom, .border-top, .border-end, .border-start {
+    border-color: var(--border) !important;
+  }
   #social .button-icon {
     filter: invert(1) brightness(2);
   }
@@ -52,6 +65,10 @@
 
 body {
   margin: 0;
+}
+
+.text-dark {
+  color: var(--text-h) !important;
 }
 
 #root {

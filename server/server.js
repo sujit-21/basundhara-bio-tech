@@ -20,7 +20,7 @@ const aboutRoutes = require('./routes/aboutRoutes');
 const aboutSectionRoutes = require('./routes/aboutSectionRoutes');
 const galleryRoutes = require('./routes/galleryRoutes');
 const sustainabilityRoutes = require('./routes/sustainabilityRoutes');
-
+const companyStatRoutes = require('./routes/companyStatRoutes');
 // Load environment variables
 dotenv.config();
 
@@ -69,6 +69,7 @@ app.use(['/api/about', '/about'], aboutRoutes);
 app.use(['/api/about-sections', '/about-sections'], aboutSectionRoutes);
 app.use(['/api/gallery', '/gallery'], galleryRoutes);
 app.use(['/api/sustainability', '/sustainability'], sustainabilityRoutes);
+app.use(['/api/company-stats', '/company-stats'], companyStatRoutes);
 
 // Simple Welcome Route
 app.get('/', (req, res) => {

@@ -7,9 +7,22 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const { login, user } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  // Load remembered credentials
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('rememberedEmail');
+    const savedPassword = localStorage.getItem('rememberedPassword');
+    if (savedEmail && savedPassword) {
+      setEmail(savedEmail);
+      setPassword(savedPassword);
+      setRememberMe(true);
+    }
+  }, []);
 
   // If already logged in, redirect
   useEffect(() => {
@@ -35,7 +48,15 @@ const Login = () => {
     const result = await login(email, password);
     setSubmitting(false);
 
-    if (!result.success) {
+    if (result.success) {
+      if (rememberMe) {
+        localStorage.setItem('rememberedEmail', email);
+        localStorage.setItem('rememberedPassword', password);
+      } else {
+        localStorage.removeItem('rememberedEmail');
+        localStorage.removeItem('rememberedPassword');
+      }
+    } else {
       setErrorMsg(result.message);
     }
   };
@@ -78,12 +99,12 @@ const Login = () => {
                   </div>
                 </div>
 
-                <div className="mb-4">
+                <div className="mb-3">
                   <label htmlFor="password" className="form-label small fw-bold text-secondary">Password</label>
                   <div className="input-group">
                     <span className="input-group-text bg-light text-muted"><i className="bi bi-key"></i></span>
                     <input
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       className="form-control"
                       id="password"
                       placeholder="••••••••"
@@ -91,7 +112,28 @@ const Login = () => {
                       onChange={(e) => { setPassword(e.target.value); setErrorMsg(''); }}
                       required
                     />
+                    <button 
+                      className="btn btn-outline-secondary" 
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      tabIndex="-1"
+                    >
+                      <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+                    </button>
                   </div>
+                </div>
+
+                <div className="mb-4 form-check text-start">
+                  <input 
+                    type="checkbox" 
+                    className="form-check-input" 
+                    id="rememberMe"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                  />
+                  <label className="form-check-label small text-muted" htmlFor="rememberMe">
+                    Remember me
+                  </label>
                 </div>
 
                 <button

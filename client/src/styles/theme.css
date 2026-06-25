@@ -1,16 +1,30 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&display=swap');
 
 :root {
-  --primary-bio: #2e7d32;       /* Forest Green */
-  --primary-tech: #d97706;      /* Earthy Amber/Gold */
-  --accent-neon: #4caf50;       /* Fresh Leaf Green */
-  --dark-bg-deep: #000000;      /* Pure Black */
-  --dark-bg-card: #121212;      /* Off-black / Charcoal */
-  --dark-bg-nav: rgba(0, 0, 0, 0.85); /* Semi-transparent black */
-  --light-bg-deep: #f4f6f4;     /* Slate-Sage White */
+  /* Green Palette */
+  --green-50: #F2F0E7;
+  --green-100: #DDE4D6;
+  --green-300: #BCCAB6;
+  --green-500: #7D977C;
+  --green-800: #2F3B33;
+
+  /* Blue Palette */
+  --blue-50: #E5F5FA;
+  --blue-100: #E0F2FC;
+  --blue-200: #C6DEF6;
+  --blue-400: #7EBADA;
+  --blue-600: #5081BE;
+
+  --primary-bio: var(--green-500);
+  --primary-tech: var(--blue-600);
+  --accent-neon: var(--blue-400);
+  --dark-bg-deep: var(--green-800);
+  --dark-bg-card: var(--green-500);
+  --dark-bg-nav: rgba(47, 59, 51, 0.85);
+  --light-bg-deep: var(--green-50);
   --light-bg-card: #ffffff;
-  --text-dark: #1b301a;
-  --text-light: #f3f4f6;        /* Clean light gray */
+  --text-dark: var(--green-800);
+  --text-light: var(--blue-50);
   --transition-speed: 0.3s;
   --font-sans: 'Inter', sans-serif;
   --font-science: 'Orbitron', sans-serif;
@@ -38,11 +52,11 @@ body {
 }
 
 .bg-gradient-science {
-  background: linear-gradient(135deg, #010601 0%, #082d08 50%, #000000 100%);
+  background: linear-gradient(135deg, var(--blue-100) 0%, var(--green-100) 50%, var(--blue-50) 100%);
 }
 
 .bg-hero-science {
-  background: linear-gradient(135deg, #e8f5e9 0%, #fef3c7 100%);
+  background: linear-gradient(135deg, var(--green-50) 0%, var(--blue-50) 100%);
   color: var(--text-dark);
 }
 
@@ -56,11 +70,11 @@ body {
 }
 
 .bg-hero-science .lead {
-  color: #374151;
+  color: var(--green-800);
 }
 
 .bg-gradient-light {
-  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  background: linear-gradient(135deg, var(--green-50), var(--blue-50));
 }
 
 /* Glassmorphism Styles */
@@ -313,11 +327,11 @@ body {
 }
 
 .dark-mode .bg-gradient-science {
-  background: linear-gradient(135deg, #000200 0%, #051a05 50%, #000000 100%) !important;
+  background: linear-gradient(135deg, var(--green-800) 0%, var(--blue-600) 50%, var(--green-800) 100%) !important;
 }
 
 .dark-mode .bg-hero-science {
-  background: linear-gradient(135deg, #000200 0%, #051a05 50%, #000000 100%) !important;
+  background: linear-gradient(135deg, var(--green-800) 0%, var(--blue-600) 50%, var(--green-800) 100%) !important;
   color: var(--text-light) !important;
 }
 
@@ -331,7 +345,7 @@ body {
 }
 
 .dark-mode .bg-hero-science .lead {
-  color: #9ca3af !important;
+  color: var(--blue-100) !important;
 }
 
 .dark-mode .modal-content {
@@ -342,21 +356,21 @@ body {
 
 /* Form inputs on Dark Mode */
 .dark-mode .form-control, .dark-mode .form-select {
-  background-color: #0d0d0d !important;
+  background-color: var(--green-800) !important;
   border-color: rgba(255, 255, 255, 0.2) !important;
   color: white !important;
 }
 
 .dark-mode .form-control:focus, .dark-mode .form-select:focus {
-  background-color: #0d0d0d !important;
+  background-color: var(--green-800) !important;
   color: white !important;
   border-color: var(--primary-bio) !important;
-  box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.25) !important;
+  box-shadow: 0 0 0 0.25rem rgba(125, 151, 124, 0.25) !important;
 }
 
 /* Dark Mode Utility Overrides */
 .dark-mode .bg-light {
-  background-color: #080808 !important;
+  background-color: var(--green-800) !important;
   color: var(--text-light) !important;
 }
 
@@ -433,10 +447,10 @@ body {
 
 /* Home Page Custom Background */
 .home-container {
-  background: linear-gradient(180deg, #f1f8f1 0%, #ffffff 100%);
+  background: linear-gradient(180deg, var(--green-50) 0%, #ffffff 100%);
   transition: background var(--transition-speed);
 }
 
 .dark-mode .home-container {
-  background: linear-gradient(180deg, #050c05 0%, #000000 100%) !important;
+  background: linear-gradient(180deg, var(--blue-600) 0%, var(--green-800) 100%) !important;
 }

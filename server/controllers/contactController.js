@@ -5,11 +5,12 @@ const Contact = require('../models/Contact');
 // @access  Public
 const submitContact = async (req, res, next) => {
   try {
-    const { name, email, subject, message } = req.body;
+    const { name, email, phone, subject, message } = req.body;
 
     const contact = new Contact({
       name,
       email,
+      phone,
       subject,
       message,
     });

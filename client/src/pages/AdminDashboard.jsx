@@ -7,6 +7,8 @@ const AdminDashboard = () => {
 
   // Active Panel Tab
   const [activeTab, setActiveTab] = useState('overview');
+  const [isCompanyOpen, setIsCompanyOpen] = useState(false);
+  const [isOfferingsOpen, setIsOfferingsOpen] = useState(false);
 
   // Datasets
   const [stats, setStats] = useState(null);
@@ -45,6 +47,9 @@ const AdminDashboard = () => {
   const [researchForm, setResearchForm] = useState({ title: '', abstract: '', authors: '', journal: '', publishDate: '', doi: '', pdfUrl: '/sample_research.pdf', category: 'Biofuels & Sustainability' });
   const [offices, setOffices] = useState([]);
   const [officeForm, setOfficeForm] = useState({ title: '', address: '', phone: '', email: '' });
+  const [companyStats, setCompanyStats] = useState([]);
+  const [companyStatForm, setCompanyStatForm] = useState({ value: '', label: '', color: 'success', order: 0 });
+  const [officesSubTab, setOfficesSubTab] = useState('directory');
   const [aboutForm, setAboutForm] = useState({ name: '', role: '', qualification: '', bio: '', icon: 'bi-person', image: '' });
   const [aboutSectionForm, setAboutSectionForm] = useState({ type: 'vision_values', title: '', content: '', icon: '', year: '', color: 'success', order: 0 });
   const [aboutSubTab, setAboutSubTab] = useState('leadership');
@@ -63,7 +68,7 @@ const AdminDashboard = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [statsRes, categoriesRes, productsRes, blogsRes, researchRes, ieRes, contactsRes, officesRes, ordersRes, aboutRes, aboutSecRes, galleryRes, sustainabilityRes] = await Promise.all([
+      const [statsRes, categoriesRes, productsRes, blogsRes, researchRes, ieRes, contactsRes, officesRes, ordersRes, aboutRes, aboutSecRes, galleryRes, sustainabilityRes, companyStatsRes] = await Promise.all([
         api.get('/analytics'),
         api.get('/categories'),
         api.get('/products?limit=100'),
@@ -77,6 +82,7 @@ const AdminDashboard = () => {
         api.get('/about-sections'),
         api.get('/gallery'),
         api.get('/sustainability'),
+        api.get('/company-stats'),
       ]);
 
       if (statsRes.data.success) setStats(statsRes.data.data);
@@ -92,6 +98,7 @@ const AdminDashboard = () => {
       if (aboutSecRes.data.success) setAboutSections(aboutSecRes.data.data);
       if (galleryRes.data.success) setGallery(galleryRes.data.data);
       if (sustainabilityRes.data.success) setSustainability(sustainabilityRes.data.data);
+      if (companyStatsRes.data.success) setCompanyStats(companyStatsRes.data.data);
     } catch (err) {
       console.error(err);
       const errMsg = err.response?.data?.message || err.message || 'Failed to synchronize system records.';
@@ -229,6 +236,24 @@ const AdminDashboard = () => {
       window.dispatchEvent(new CustomEvent('offices-updated'));
     } catch (err) {
       triggerAlert(err.response?.data?.message || 'Office action failed.', 'danger');
+    }
+  };
+
+  // Submit Company Stat
+  const handleCompanyStatSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (isEditMode) {
+        await api.put(`/company-stats/${currentItem._id}`, companyStatForm);
+        triggerAlert('Company stat updated.');
+      } else {
+        await api.post('/company-stats', companyStatForm);
+        triggerAlert('Company stat added successfully.');
+      }
+      setShowForm(false);
+      loadData();
+    } catch (err) {
+      triggerAlert(err.response?.data?.message || 'Company stat action failed.', 'danger');
     }
   };
 
@@ -405,6 +430,8 @@ const AdminDashboard = () => {
       setResearchForm({ title: '', abstract: '', authors: 'Roy, B.', journal: 'Sustainable Agriculture Journal', publishDate: new Date().toISOString().split('T')[0], doi: '', pdfUrl: '/sample_research.pdf', category: 'Biofuels & Sustainability' });
     } else if (type === 'offices') {
       setOfficeForm({ title: '', address: '', phone: '', email: '' });
+    } else if (type === 'company-stats') {
+      setCompanyStatForm({ value: '', label: '', color: 'success', order: 0 });
     } else if (type === 'about') {
       setAboutForm({ name: '', role: '', qualification: '', bio: '', icon: 'bi-person', image: '' });
     } else if (type === 'about-section') {
@@ -437,6 +464,8 @@ const AdminDashboard = () => {
       setResearchForm({ title: item.title, abstract: item.abstract, authors: item.authors, journal: item.journal, publishDate: item.publishDate ? item.publishDate.split('T')[0] : '', doi: item.doi, pdfUrl: item.pdfUrl, category: item.category });
     } else if (type === 'offices') {
       setOfficeForm({ title: item.title, address: item.address, phone: item.phone, email: item.email });
+    } else if (type === 'company-stats') {
+      setCompanyStatForm({ value: item.value, label: item.label, color: item.color, order: item.order || 0 });
     } else if (type === 'about') {
       setAboutForm({ name: item.name, role: item.role, qualification: item.qualification, bio: item.bio, icon: item.icon || 'bi-person', image: item.image || '' });
     } else if (type === 'about-section') {
@@ -576,24 +605,64 @@ const AdminDashboard = () => {
               <button onClick={() => { setActiveTab('overview'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent ${activeTab === 'overview' ? 'active' : ''}`}>
                 <i className="bi bi-pie-chart-fill me-2"></i> Overview
               </button>
-              <button onClick={() => { setActiveTab('categories'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent ${activeTab === 'categories' ? 'active' : ''}`}>
-                <i className="bi bi-grid-fill me-2"></i> Categories
-              </button>
-              <button onClick={() => { setActiveTab('products'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent ${activeTab === 'products' ? 'active' : ''}`}>
-                <i className="bi bi-basket3-fill me-2"></i> Products
-              </button>
+
+              {/* Company Dropdown */}
+              <div className="nav-item">
+                <button 
+                  onClick={() => setIsCompanyOpen(!isCompanyOpen)} 
+                  className="nav-link border-0 text-start bg-transparent w-100 d-flex justify-content-between align-items-center"
+                >
+                  <span><i className="bi bi-building-fill me-2"></i> Company</span>
+                  <i className={`bi bi-chevron-${isCompanyOpen ? 'up' : 'down'} small`}></i>
+                </button>
+                {isCompanyOpen && (
+                  <div className="ps-4 d-flex flex-column gap-1 mt-1 mb-2">
+                    <button onClick={() => { setActiveTab('about'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent py-1 ${activeTab === 'about' ? 'active text-success fw-bold' : 'text-muted'}`}>
+                      About Us
+                    </button>
+                    <button onClick={() => { setActiveTab('research'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent py-1 ${activeTab === 'research' ? 'active text-success fw-bold' : 'text-muted'}`}>
+                      Research
+                    </button>
+                    <button onClick={() => { setActiveTab('sustainability'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent py-1 ${activeTab === 'sustainability' ? 'active text-success fw-bold' : 'text-muted'}`}>
+                      Sustainability
+                    </button>
+                    <button onClick={() => { setActiveTab('gallery'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent py-1 ${activeTab === 'gallery' ? 'active text-success fw-bold' : 'text-muted'}`}>
+                      Gallery
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Offerings Dropdown */}
+              <div className="nav-item">
+                <button 
+                  onClick={() => setIsOfferingsOpen(!isOfferingsOpen)} 
+                  className="nav-link border-0 text-start bg-transparent w-100 d-flex justify-content-between align-items-center"
+                >
+                  <span><i className="bi bi-box-seam-fill me-2"></i> Offerings</span>
+                  <i className={`bi bi-chevron-${isOfferingsOpen ? 'up' : 'down'} small`}></i>
+                </button>
+                {isOfferingsOpen && (
+                  <div className="ps-4 d-flex flex-column gap-1 mt-1 mb-2">
+                    <button onClick={() => { setActiveTab('categories'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent py-1 ${activeTab === 'categories' ? 'active text-success fw-bold' : 'text-muted'}`}>
+                      Categories
+                    </button>
+                    <button onClick={() => { setActiveTab('products'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent py-1 ${activeTab === 'products' ? 'active text-success fw-bold' : 'text-muted'}`}>
+                      Products
+                    </button>
+                    <button onClick={() => { setActiveTab('importexport'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent py-1 ${activeTab === 'importexport' ? 'active text-success fw-bold' : 'text-muted'}`}>
+                      Logistics
+                    </button>
+                  </div>
+                )}
+              </div>
+
               <button onClick={() => { setActiveTab('orders'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent ${activeTab === 'orders' ? 'active' : ''}`}>
                 <i className="bi bi-receipt-cutoff me-2"></i> Orders
                 {stats?.orders?.pending > 0 && <span className="badge bg-danger ms-2">{stats.orders.pending}</span>}
               </button>
-              <button onClick={() => { setActiveTab('importexport'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent ${activeTab === 'importexport' ? 'active' : ''}`}>
-                <i className="bi bi-globe2 me-2"></i> Logistics
-              </button>
               <button onClick={() => { setActiveTab('blogs'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent ${activeTab === 'blogs' ? 'active' : ''}`}>
                 <i className="bi bi-journal-text me-2"></i> Blogs
-              </button>
-              <button onClick={() => { setActiveTab('research'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent ${activeTab === 'research' ? 'active' : ''}`}>
-                <i className="bi bi-file-earmark-medical-fill me-2"></i> Research
               </button>
               <button onClick={() => { setActiveTab('messages'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent ${activeTab === 'messages' ? 'active' : ''}`}>
                 <i className="bi bi-chat-left-text-fill me-2"></i> Inquiries 
@@ -601,15 +670,6 @@ const AdminDashboard = () => {
               </button>
               <button onClick={() => { setActiveTab('offices'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent ${activeTab === 'offices' ? 'active' : ''}`}>
                 <i className="bi bi-geo-alt-fill me-2"></i> Trade Offices
-              </button>
-              <button onClick={() => { setActiveTab('about'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent ${activeTab === 'about' ? 'active' : ''}`}>
-                <i className="bi bi-info-circle-fill me-2"></i> About Us
-              </button>
-              <button onClick={() => { setActiveTab('gallery'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent ${activeTab === 'gallery' ? 'active' : ''}`}>
-                <i className="bi bi-images me-2"></i> Gallery
-              </button>
-              <button onClick={() => { setActiveTab('sustainability'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent ${activeTab === 'sustainability' ? 'active' : ''}`}>
-                <i className="bi bi-recycle me-2"></i> Sustainability
               </button>
             </nav>
 
@@ -1571,6 +1631,7 @@ const AdminDashboard = () => {
                               <td>
                                 <div className="fw-semibold text-dark">{m.name}</div>
                                 <div className="small text-muted">{m.email}</div>
+                                {m.phone && <div className="small text-muted"><i className="bi bi-telephone-fill me-1"></i>{m.phone}</div>}
                               </td>
                               <td>{m.productInquiry ? <span className="badge bg-success bg-opacity-25 text-success border border-success border-opacity-10">{m.productInquiry}</span> : <span className="text-muted small">General Inquiry</span>}</td>
                               <td className="small fw-semibold">{m.subject}</td>
@@ -1606,14 +1667,34 @@ const AdminDashboard = () => {
                 {/* --- TAB: MANAGE OFFICES --- */}
                 {activeTab === 'offices' && (
                   <div>
+                    {/* Inner Sub-Tabs Navigation */}
+                    <div className="d-flex gap-2 mb-4 border-bottom pb-2">
+                      <button
+                        type="button"
+                        className={`btn btn-sm rounded-pill px-3 py-1.5 fw-semibold ${officesSubTab === 'directory' ? 'btn-success text-white' : 'btn-light border border-secondary border-opacity-10 text-dark'}`}
+                        onClick={() => { setOfficesSubTab('directory'); setShowForm(false); }}
+                      >
+                        <i className="bi bi-building me-1.5"></i> Office Directory
+                      </button>
+                      <button
+                        type="button"
+                        className={`btn btn-sm rounded-pill px-3 py-1.5 fw-semibold ${officesSubTab === 'stats' ? 'btn-success text-white' : 'btn-light border border-secondary border-opacity-10 text-dark'}`}
+                        onClick={() => { setOfficesSubTab('stats'); setShowForm(false); }}
+                      >
+                        <i className="bi bi-bar-chart-fill me-1.5"></i> Company Statistics
+                      </button>
+                    </div>
+
                     {!showForm ? (
                       <div>
-                        <div className="d-flex justify-content-between align-items-center mb-3">
-                          <h3 className="science-font fs-4 fw-bold">Trade Offices ({offices.length})</h3>
-                          <button onClick={() => openAddForm('offices')} className="btn btn-sm btn-success">
-                            <i className="bi bi-plus-circle me-1"></i> Add Office
-                          </button>
-                        </div>
+                        {officesSubTab === 'directory' ? (
+                          <div>
+                            <div className="d-flex justify-content-between align-items-center mb-3">
+                              <h3 className="science-font fs-4 fw-bold">Trade Offices ({offices.length})</h3>
+                              <button onClick={() => openAddForm('offices')} className="btn btn-sm btn-success">
+                                <i className="bi bi-plus-circle me-1"></i> Add Office
+                              </button>
+                            </div>
                         <div className="table-responsive">
                           <table className="table custom-table align-middle">
                             <thead>
@@ -1643,35 +1724,123 @@ const AdminDashboard = () => {
                             </tbody>
                           </table>
                         </div>
+                          </div>
+                        ) : (
+                          <div>
+                            <div className="d-flex justify-content-between align-items-center mb-3">
+                              <h3 className="science-font fs-4 fw-bold">Company Statistics ({companyStats.length})</h3>
+                              <button onClick={() => openAddForm('company-stats')} className="btn btn-sm btn-success">
+                                <i className="bi bi-plus-circle me-1"></i> Add Statistic
+                              </button>
+                            </div>
+                            <div className="table-responsive">
+                              <table className="table custom-table align-middle">
+                                <thead>
+                                  <tr>
+                                    <th>Value</th>
+                                    <th>Label</th>
+                                    <th>Theme Color</th>
+                                    <th>Order</th>
+                                    <th>Actions</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {companyStats.map((s) => (
+                                    <tr key={s._id}>
+                                      <td><span className={`fw-bold text-${s.color}`}>{s.value}</span></td>
+                                      <td><span className="fw-semibold text-dark">{s.label}</span></td>
+                                      <td><span className={`badge bg-${s.color}`}>{s.color}</span></td>
+                                      <td className="font-monospace">{s.order}</td>
+                                      <td>
+                                        <div className="d-flex gap-2">
+                                          <button onClick={() => openEditForm('company-stats', s)} className="btn btn-xs btn-outline-primary py-1 px-2.5 small"><i className="bi bi-pencil-square"></i></button>
+                                          <button onClick={() => handleDelete('/company-stats', s._id)} className="btn btn-xs btn-outline-danger py-1 px-2.5 small"><i className="bi bi-trash"></i></button>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                  {companyStats.length === 0 && (
+                                    <tr>
+                                      <td colSpan="5" className="text-center py-4 text-muted">No statistics registered yet. Add some to display on the Home page.</td>
+                                    </tr>
+                                  )}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ) : (
-                      // Add/Edit Office Form
-                      <div className="card glass-card p-4 max-w-xl mx-auto text-start" style={{ maxWidth: '650px', margin: '0 auto' }}>
-                        <h4 className="science-font fw-bold mb-4">{isEditMode ? 'Modify Office Details' : 'Register New Trade Office'}</h4>
-                        <form onSubmit={handleOfficeSubmit}>
-                          <div className="mb-3">
-                            <label className="form-label small fw-bold text-dark">Office Name/Title</label>
-                            <input type="text" className="form-control" value={officeForm.title} onChange={e => setOfficeForm({ ...officeForm, title: e.target.value })} required placeholder="e.g. Basundhara Bio-Tech HQ" />
+                      // Forms
+                      <div>
+                        {officesSubTab === 'directory' ? (
+                          // Add/Edit Office Form
+                          <div className="card glass-card p-4 max-w-xl mx-auto text-start" style={{ maxWidth: '650px', margin: '0 auto' }}>
+                            <h4 className="science-font fw-bold mb-4">{isEditMode ? 'Modify Office Details' : 'Register New Trade Office'}</h4>
+                            <form onSubmit={handleOfficeSubmit}>
+                              <div className="mb-3">
+                                <label className="form-label small fw-bold text-dark">Office Name/Title</label>
+                                <input type="text" className="form-control" value={officeForm.title} onChange={e => setOfficeForm({ ...officeForm, title: e.target.value })} required placeholder="e.g. Basundhara Bio-Tech HQ" />
+                              </div>
+                              <div className="mb-3">
+                                <label className="form-label small fw-bold text-dark">Office Address</label>
+                                <input type="text" className="form-control" value={officeForm.address} onChange={e => setOfficeForm({ ...officeForm, address: e.target.value })} required placeholder="Sector V, Salt Lake..." />
+                              </div>
+                              <div className="row mb-4">
+                                <div className="col-md-6">
+                                  <label className="form-label small fw-bold text-dark">Phone Number</label>
+                                  <input type="text" className="form-control" value={officeForm.phone} onChange={e => setOfficeForm({ ...officeForm, phone: e.target.value })} required placeholder="+91 (033) 2440-9876" />
+                                </div>
+                                <div className="col-md-6">
+                                  <label className="form-label small fw-bold text-dark">Email Address</label>
+                                  <input type="email" className="form-control" value={officeForm.email} onChange={e => setOfficeForm({ ...officeForm, email: e.target.value })} required placeholder="info@basundharabiotech.com" />
+                                </div>
+                              </div>
+                              <div className="d-flex gap-2">
+                                <button type="submit" className="btn btn-success px-4">Save Specifications</button>
+                                <button type="button" onClick={() => setShowForm(false)} className="btn btn-secondary px-3">Cancel</button>
+                              </div>
+                            </form>
                           </div>
-                          <div className="mb-3">
-                            <label className="form-label small fw-bold text-dark">Office Address</label>
-                            <input type="text" className="form-control" value={officeForm.address} onChange={e => setOfficeForm({ ...officeForm, address: e.target.value })} required placeholder="Sector V, Salt Lake..." />
+                        ) : (
+                          // Add/Edit Company Stat Form
+                          <div className="card glass-card p-4 max-w-xl mx-auto text-start" style={{ maxWidth: '650px', margin: '0 auto' }}>
+                            <h4 className="science-font fw-bold mb-4">{isEditMode ? 'Modify Statistic Details' : 'Register New Statistic'}</h4>
+                            <form onSubmit={handleCompanyStatSubmit}>
+                              <div className="row mb-3">
+                                <div className="col-md-6">
+                                  <label className="form-label small fw-bold text-dark">Statistic Value</label>
+                                  <input type="text" className="form-control" value={companyStatForm.value} onChange={e => setCompanyStatForm({ ...companyStatForm, value: e.target.value })} required placeholder="e.g. 13+" />
+                                </div>
+                                <div className="col-md-6">
+                                  <label className="form-label small fw-bold text-dark">Label</label>
+                                  <input type="text" className="form-control" value={companyStatForm.label} onChange={e => setCompanyStatForm({ ...companyStatForm, label: e.target.value })} required placeholder="e.g. Industry Sectors" />
+                                </div>
+                              </div>
+                              <div className="row mb-4">
+                                <div className="col-md-6">
+                                  <label className="form-label small fw-bold text-dark">Theme Color</label>
+                                  <select className="form-select" value={companyStatForm.color} onChange={e => setCompanyStatForm({ ...companyStatForm, color: e.target.value })}>
+                                    <option value="success">Success (Green)</option>
+                                    <option value="primary">Primary (Blue)</option>
+                                    <option value="warning">Warning (Yellow)</option>
+                                    <option value="danger">Danger (Red)</option>
+                                    <option value="info">Info (Light Blue)</option>
+                                    <option value="secondary">Secondary (Gray)</option>
+                                  </select>
+                                </div>
+                                <div className="col-md-6">
+                                  <label className="form-label small fw-bold text-dark">Display Order (Sorting)</label>
+                                  <input type="number" className="form-control" value={companyStatForm.order} onChange={e => setCompanyStatForm({ ...companyStatForm, order: Number(e.target.value) })} required />
+                                </div>
+                              </div>
+                              <div className="d-flex gap-2">
+                                <button type="submit" className="btn btn-success px-4">Save Statistic</button>
+                                <button type="button" onClick={() => setShowForm(false)} className="btn btn-secondary px-3">Cancel</button>
+                              </div>
+                            </form>
                           </div>
-                          <div className="row mb-4">
-                            <div className="col-md-6">
-                              <label className="form-label small fw-bold text-dark">Phone Number</label>
-                              <input type="text" className="form-control" value={officeForm.phone} onChange={e => setOfficeForm({ ...officeForm, phone: e.target.value })} required placeholder="+91 (033) 2440-9876" />
-                            </div>
-                            <div className="col-md-6">
-                              <label className="form-label small fw-bold text-dark">Email Address</label>
-                              <input type="email" className="form-control" value={officeForm.email} onChange={e => setOfficeForm({ ...officeForm, email: e.target.value })} required placeholder="info@basundharabiotech.com" />
-                            </div>
-                          </div>
-                          <div className="d-flex gap-2">
-                            <button type="submit" className="btn btn-success px-4">Save Specifications</button>
-                            <button type="button" onClick={() => setShowForm(false)} className="btn btn-secondary px-3">Cancel</button>
-                          </div>
-                        </form>
+                        )}
                       </div>
                     )}
                   </div>

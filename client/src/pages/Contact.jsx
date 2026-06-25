@@ -5,6 +5,7 @@ const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phone: '',
     subject: '',
     message: '',
   });
@@ -41,7 +42,7 @@ const Contact = () => {
     };
   }, []);
 
-  const { name, email, subject, message } = formData;
+  const { name, email, phone, subject, message } = formData;
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -86,12 +87,11 @@ const Contact = () => {
         {/* Header */}
         <div className="text-center mb-5">
           <span className="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill science-font mb-2">Connect With Us</span>
-          <h1 className="science-font fw-bold text-gradient-bio">Contact Our Laboratories</h1>
+          <h1 className="science-font fw-bold text-gradient-bio">Contact Us</h1>
           <p className="text-muted" style={{ maxWidth: '700px', margin: '0 auto' }}>
-            Have a partnership request or biological inquiry? Reach out to our technical coordinators.
+            Have a question or inquiry? We'd love to hear from you. Send us a message and our team will get back to you soon.
           </p>
         </div>
-
         <div className="row g-5">
           {/* Coordinates column */}
           <div className="col-lg-5">
@@ -136,14 +136,6 @@ const Contact = () => {
               ))}
             </div>
 
-            {/* Mock Map Preview Frame */}
-            <div className="card border border-secondary border-opacity-10 p-2 overflow-hidden shadow-sm" style={{ background: '#f1f5f9', borderRadius: '16px', height: '220px' }}>
-              <div className="w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-gradient-science text-white text-center rounded-3 p-3">
-                <i className="bi bi-map-fill text-success fs-1 mb-2"></i>
-                <h5 className="science-font fw-bold mb-1 small">Interactive Location Map</h5>
-                <p className="text-secondary small mb-0">Salt Lake Sector V Tech Hub, West Bengal, India</p>
-              </div>
-            </div>
           </div>
 
           {/* Form column */}
@@ -175,7 +167,7 @@ const Contact = () => {
                       className="form-control"
                       id="name"
                       name="name"
-                      placeholder="Dr. John Doe"
+                      placeholder="Full Name"
                       value={name}
                       onChange={handleChange}
                       required
@@ -189,21 +181,34 @@ const Contact = () => {
                       className="form-control"
                       id="email"
                       name="email"
-                      placeholder="johndoe@institution.edu"
+                      placeholder="E-mail Address"
                       value={email}
                       onChange={handleChange}
                       required
                     />
                   </div>
+                  {/* Phone (Optional) */}
+                  <div className="col-md-6">
+                    <label htmlFor="phone" className="form-label small fw-bold text-secondary">Contact Number (Optional)</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="phone"
+                      name="phone"
+                      placeholder="Phone Number"
+                      value={phone}
+                      onChange={handleChange}
+                    />
+                  </div>
                   {/* Subject */}
-                  <div className="col-12">
+                  <div className="col-md-6">
                     <label htmlFor="subject" className="form-label small fw-bold text-secondary">Inquiry Subject</label>
                     <input
                       type="text"
                       className="form-control"
                       id="subject"
                       name="subject"
-                      placeholder="e.g. DNA sequencing partnership, drug docking consultation..."
+                      placeholder="Subject"
                       value={subject}
                       onChange={handleChange}
                       required

@@ -1,19 +1,33 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import DNAAnimation from '../components/DNAAnimation';
+import img1 from '../homepage_image/moringa leaves.jpg';
+import img2 from '../homepage_image/moringa leaves2.jpg';
+import img3 from '../homepage_image/moringa leaves3.jpeg';
 import api from '../services/api';
 
 const Home = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [companyStats, setCompanyStats] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const slides = [img1, img2, img3];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const fetchHomeData = async () => {
       try {
-        const [productsRes, categoriesRes] = await Promise.all([
+        const [productsRes, categoriesRes, statsRes] = await Promise.all([
           api.get('/products?limit=3'),
           api.get('/categories'),
+          api.get('/company-stats'),
         ]);
 
         if (productsRes.data.success && Array.isArray(productsRes.data.data)) {
@@ -21,6 +35,9 @@ const Home = () => {
         }
         if (categoriesRes.data.success && Array.isArray(categoriesRes.data.data)) {
           setCategories(categoriesRes.data.data.slice(0, 4)); // Show top 4 categories
+        }
+        if (statsRes.data.success && Array.isArray(statsRes.data.data)) {
+          setCompanyStats(statsRes.data.data);
         }
       } catch (err) {
         console.error('Error fetching home data:', err);
@@ -36,15 +53,29 @@ const Home = () => {
     <div className="home-container">
       {/* 1. Hero Section */}
       <section className="bg-hero-science position-relative overflow-hidden py-5 d-flex align-items-center" style={{ minHeight: '85vh' }}>
-        <div className="hero-canvas-container">
-          <DNAAnimation />
+        <div className="hero-slider-container" style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0 }}>
+          {slides.map((slide, index) => (
+            <div
+              key={index}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                backgroundImage: `url('${slide}')`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                opacity: currentSlide === index ? 1 : 0,
+                transition: 'opacity 1.5s ease-in-out, transform 4.5s ease-out',
+                transform: currentSlide === index ? 'scale(1.05)' : 'scale(1)',
+              }}
+            />
+          ))}
+          {/* Overlay to ensure text readability against images */}
+          <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(242, 240, 231, 0.4)' }}></div>
         </div>
         <div className="container position-relative" style={{ zIndex: 1 }}>
           <div className="row align-items-center g-5">
             <div className="col-lg-7 text-start">
-              <span className="badge bg-success bg-opacity-25 border border-success text-success px-3 py-2 rounded-pill science-font mb-3">
-                <i className="bi bi-patch-check-fill me-1"></i> Sustainable Development & Global Trade
-              </span>
+
               <h1 className="display-4 fw-bold mb-3 science-font lh-base">
                 Cultivating <span className="text-gradient-bio">Green Innovations</span> For Global Trade
               </h1>
@@ -70,23 +101,35 @@ const Home = () => {
       {/* 2. Counter Stats */}
       <section className="bg-light border-bottom border-top py-4">
         <div className="container">
-          <div className="row g-4 text-center">
-            <div className="col-md-3 col-6">
-              <h3 className="science-font fw-bold text-success">13+</h3>
-              <p className="text-muted small mb-0">Industry Sectors</p>
-            </div>
-            <div className="col-md-3 col-6">
-              <h3 className="science-font fw-bold text-primary">500+ MT</h3>
-              <p className="text-muted small mb-0">Products Exported</p>
-            </div>
-            <div className="col-md-3 col-6">
-              <h3 className="science-font fw-bold text-success">25+</h3>
-              <p className="text-muted small mb-0">Circular Green Projects</p>
-            </div>
-            <div className="col-md-3 col-6">
-              <h3 className="science-font fw-bold text-primary">10k+</h3>
-              <p className="text-muted small mb-0">Farmers Partnered</p>
-            </div>
+          <div className="row g-4 text-center justify-content-center">
+            {companyStats.length > 0 ? (
+              companyStats.map((stat, idx) => (
+                <div key={stat._id} className="col-md-3 col-6">
+                  <h3 className={`science-font fw-bold text-${stat.color}`}>{stat.value}</h3>
+                  <p className="text-muted small mb-0">{stat.label}</p>
+                </div>
+              ))
+            ) : (
+              // Fallback if no stats are created yet
+              <>
+                <div className="col-md-3 col-6">
+                  <h3 className="science-font fw-bold text-success">13+</h3>
+                  <p className="text-muted small mb-0">Industry Sectors</p>
+                </div>
+                <div className="col-md-3 col-6">
+                  <h3 className="science-font fw-bold text-primary">500+ MT</h3>
+                  <p className="text-muted small mb-0">Products Exported</p>
+                </div>
+                <div className="col-md-3 col-6">
+                  <h3 className="science-font fw-bold text-success">25+</h3>
+                  <p className="text-muted small mb-0">Circular Green Projects</p>
+                </div>
+                <div className="col-md-3 col-6">
+                  <h3 className="science-font fw-bold text-primary">10k+</h3>
+                  <p className="text-muted small mb-0">Farmers Partnered</p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>

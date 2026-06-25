@@ -55,26 +55,26 @@ const Navbar = () => {
             <li className="nav-item">
               <NavLink className={({ isActive }) => `nav-link fw-semibold ${isActive ? 'text-success' : ''}`} to="/">Home</NavLink>
             </li>
-            <li className="nav-item">
-              <NavLink className={({ isActive }) => `nav-link fw-semibold ${isActive ? 'text-success' : ''}`} to="/about">About</NavLink>
+            <li className="nav-item dropdown">
+              <a className="nav-link dropdown-toggle fw-semibold" href="#" id="companyDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Company
+              </a>
+              <ul className="dropdown-menu border-0 shadow" aria-labelledby="companyDropdown">
+                <li><NavLink className={({ isActive }) => `dropdown-item ${isActive ? 'text-success bg-light' : ''}`} to="/about">About</NavLink></li>
+                <li><NavLink className={({ isActive }) => `dropdown-item ${isActive ? 'text-success bg-light' : ''}`} to="/research">Research</NavLink></li>
+                <li><NavLink className={({ isActive }) => `dropdown-item ${isActive ? 'text-success bg-light' : ''}`} to="/sustainability">Sustainability</NavLink></li>
+                <li><NavLink className={({ isActive }) => `dropdown-item ${isActive ? 'text-success bg-light' : ''}`} to="/gallery">Gallery</NavLink></li>
+              </ul>
             </li>
-            <li className="nav-item">
-              <NavLink className={({ isActive }) => `nav-link fw-semibold ${isActive ? 'text-success' : ''}`} to="/categories">Categories</NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className={({ isActive }) => `nav-link fw-semibold ${isActive ? 'text-success' : ''}`} to="/products">Products</NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className={({ isActive }) => `nav-link fw-semibold ${isActive ? 'text-success' : ''}`} to="/research">Research</NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className={({ isActive }) => `nav-link fw-semibold ${isActive ? 'text-success' : ''}`} to="/sustainability">Sustainability</NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className={({ isActive }) => `nav-link fw-semibold ${isActive ? 'text-success' : ''}`} to="/importexport">Import-Export</NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className={({ isActive }) => `nav-link fw-semibold ${isActive ? 'text-success' : ''}`} to="/gallery">Gallery</NavLink>
+            <li className="nav-item dropdown">
+              <a className="nav-link dropdown-toggle fw-semibold" href="#" id="offeringsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Offerings
+              </a>
+              <ul className="dropdown-menu border-0 shadow" aria-labelledby="offeringsDropdown">
+                <li><NavLink className={({ isActive }) => `dropdown-item ${isActive ? 'text-success bg-light' : ''}`} to="/categories">Categories</NavLink></li>
+                <li><NavLink className={({ isActive }) => `dropdown-item ${isActive ? 'text-success bg-light' : ''}`} to="/products">Products</NavLink></li>
+                <li><NavLink className={({ isActive }) => `dropdown-item ${isActive ? 'text-success bg-light' : ''}`} to="/importexport">Import-Export</NavLink></li>
+              </ul>
             </li>
             <li className="nav-item">
               <NavLink className={({ isActive }) => `nav-link fw-semibold ${isActive ? 'text-success' : ''}`} to="/blog">Blog</NavLink>
