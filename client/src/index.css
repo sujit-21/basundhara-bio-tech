@@ -126,3 +126,7 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+.bg-gradient-science {
+  background: linear-gradient(135deg, #0b1121 0%, #172a46 100%);
+}

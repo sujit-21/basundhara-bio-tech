@@ -158,7 +158,7 @@ const Home = () => {
           <div className="d-flex justify-content-between align-items-end mb-5">
             <div className="text-start">
               <h2 className="science-font fw-bold text-white mb-2">Featured Premium Catalog</h2>
-              <p className="text-secondary mb-0">Pure organic supplements, cold-dehydrated flakes, and Ayurvedic extracts</p>
+              <p className="text-white-50 mb-0">Pure organic supplements, cold-dehydrated flakes, and Ayurvedic extracts</p>
             </div>
             <Link to="/products" className="btn btn-outline-success d-none d-md-inline-block">View Full Catalog</Link>
           </div>
@@ -180,11 +180,11 @@ const Home = () => {
                       />
                     )}
                     <div className="d-flex justify-content-between align-items-center mb-2">
-                      <span className="badge bg-success bg-opacity-20 text-success text-xs px-2.5 py-1">{prod.category?.name}</span>
-                      <span className="text-secondary small font-monospace">{prod.price}</span>
+                      <span className="badge bg-success text-white text-xs px-2.5 py-1">{prod.category?.name}</span>
+                      <span className="text-white-50 small font-monospace">{prod.price}</span>
                     </div>
                     <h4 className="fs-5 fw-bold text-white mb-2">{prod.title}</h4>
-                    <p className="text-secondary small mb-4" style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    <p className="text-white-50 small mb-4" style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                       {prod.description}
                     </p>
                     <Link to="/products" className="btn btn-sm btn-outline-light w-100 mt-auto">
