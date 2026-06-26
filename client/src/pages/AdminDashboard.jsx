@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import api from '../services/api';
+import { compressImage } from '../utils/imageCompressor';
 
 const AdminDashboard = () => {
   const { user } = useContext(AuthContext);
@@ -311,29 +312,22 @@ const AdminDashboard = () => {
   };
 
   // Gallery multi image upload
-  const handleGalleryImageUpload = (e) => {
+  const handleGalleryImageUpload = async (e) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
 
-    let loadedImages = [];
-    let count = 0;
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        loadedImages.push(reader.result);
-        count++;
-        if (count === files.length) {
-          setGalleryForm((prev) => {
-            const updatedImages = [...(prev.images || []), ...loadedImages];
-            return {
-              ...prev,
-              images: updatedImages,
-            };
-          });
-        }
-      };
-      reader.readAsDataURL(file);
-    });
+    try {
+      const loadedImages = await Promise.all(files.map(file => compressImage(file)));
+      setGalleryForm((prev) => {
+        const updatedImages = [...(prev.images || []), ...loadedImages];
+        return {
+          ...prev,
+          images: updatedImages,
+        };
+      });
+    } catch (err) {
+      console.error('Error compressing gallery image:', err);
+    }
     e.target.value = '';
   };
 
@@ -471,30 +465,23 @@ const AdminDashboard = () => {
     });
   };
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
 
-    let loadedImages = [];
-    let count = 0;
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        loadedImages.push(reader.result);
-        count++;
-        if (count === files.length) {
-          setCategoryForm((prev) => {
-            const updatedImages = [...(prev.images || []), ...loadedImages];
-            return {
-              ...prev,
-              images: updatedImages,
-              image: prev.image || updatedImages[0] || '',
-            };
-          });
-        }
-      };
-      reader.readAsDataURL(file);
-    });
+    try {
+      const loadedImages = await Promise.all(files.map(file => compressImage(file)));
+      setCategoryForm((prev) => {
+        const updatedImages = [...(prev.images || []), ...loadedImages];
+        return {
+          ...prev,
+          images: updatedImages,
+          image: prev.image || updatedImages[0] || '',
+        };
+      });
+    } catch (err) {
+      console.error('Error compressing category image:', err);
+    }
     e.target.value = '';
   };
 
@@ -511,30 +498,23 @@ const AdminDashboard = () => {
     setCategoryImageUrlInput('');
   };
 
-  const handleProductImageUpload = (e) => {
+  const handleProductImageUpload = async (e) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
 
-    let loadedImages = [];
-    let count = 0;
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        loadedImages.push(reader.result);
-        count++;
-        if (count === files.length) {
-          setProductForm((prev) => {
-            const updatedImages = [...(prev.images || []), ...loadedImages];
-            return {
-              ...prev,
-              images: updatedImages,
-              image: prev.image || updatedImages[0] || '',
-            };
-          });
-        }
-      };
-      reader.readAsDataURL(file);
-    });
+    try {
+      const loadedImages = await Promise.all(files.map(file => compressImage(file)));
+      setProductForm((prev) => {
+        const updatedImages = [...(prev.images || []), ...loadedImages];
+        return {
+          ...prev,
+          images: updatedImages,
+          image: prev.image || updatedImages[0] || '',
+        };
+      });
+    } catch (err) {
+      console.error('Error compressing product image:', err);
+    }
     e.target.value = '';
   };
 
@@ -551,14 +531,15 @@ const AdminDashboard = () => {
     setProductImageUrlInput('');
   };
 
-  const handleAboutImageUpload = (e) => {
+  const handleAboutImageUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAboutForm((prev) => ({ ...prev, image: reader.result }));
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressedImage = await compressImage(file);
+        setAboutForm((prev) => ({ ...prev, image: compressedImage }));
+      } catch (err) {
+        console.error('Error compressing about image:', err);
+      }
     }
     e.target.value = '';
   };
