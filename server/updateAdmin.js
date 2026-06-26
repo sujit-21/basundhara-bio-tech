@@ -1,6 +1,16 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const User = require('./models/User');
+const dns = require('dns');
+
+// Configure custom DNS servers to bypass local ISP blocks on SRV records, but only locally
+if (process.env.NODE_ENV !== 'production') {
+  try {
+    dns.setServers(['8.8.8.8', '8.8.4.4']);
+  } catch (err) {
+    console.warn('Could not set DNS servers', err);
+  }
+}
 
 dotenv.config();
 

@@ -99,40 +99,20 @@ const Home = () => {
       </section>
 
       {/* 2. Counter Stats */}
-      <section className="bg-light border-bottom border-top py-4">
-        <div className="container">
-          <div className="row g-4 text-center justify-content-center">
-            {companyStats.length > 0 ? (
-              companyStats.map((stat, idx) => (
+      {companyStats.length > 0 && (
+        <section className="bg-light border-bottom border-top py-4">
+          <div className="container">
+            <div className="row g-4 text-center justify-content-center">
+              {companyStats.map((stat) => (
                 <div key={stat._id} className="col-md-3 col-6">
                   <h3 className={`science-font fw-bold text-${stat.color}`}>{stat.value}</h3>
                   <p className="text-muted small mb-0">{stat.label}</p>
                 </div>
-              ))
-            ) : (
-              // Fallback if no stats are created yet
-              <>
-                <div className="col-md-3 col-6">
-                  <h3 className="science-font fw-bold text-success">13+</h3>
-                  <p className="text-muted small mb-0">Industry Sectors</p>
-                </div>
-                <div className="col-md-3 col-6">
-                  <h3 className="science-font fw-bold text-primary">500+ MT</h3>
-                  <p className="text-muted small mb-0">Products Exported</p>
-                </div>
-                <div className="col-md-3 col-6">
-                  <h3 className="science-font fw-bold text-success">25+</h3>
-                  <p className="text-muted small mb-0">Circular Green Projects</p>
-                </div>
-                <div className="col-md-3 col-6">
-                  <h3 className="science-font fw-bold text-primary">10k+</h3>
-                  <p className="text-muted small mb-0">Farmers Partnered</p>
-                </div>
-              </>
-            )}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* 3. Industry Sectors Teaser */}
       <section className="py-5">

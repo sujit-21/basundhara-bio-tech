@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Detect host for base URL (allows seamless operation on local machines and deployment environments)
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:5000/api');
 
 const api = axios.create({
   baseURL: API_URL,
