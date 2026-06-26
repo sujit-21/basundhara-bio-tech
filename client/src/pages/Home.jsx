@@ -131,6 +131,16 @@ const Home = () => {
               {categories.map((cat) => (
                 <div className="col-lg-3 col-md-6" key={cat._id}>
                   <div className="card glass-card h-100 p-4 border border-secondary border-opacity-10 text-start">
+                    {(cat.image || (cat.images && cat.images.length > 0)) && (
+                      <div className="mb-3 rounded overflow-hidden" style={{ height: '150px' }}>
+                        <img 
+                          src={cat.image || cat.images[0]} 
+                          alt={cat.name} 
+                          className="w-100 h-100 object-fit-cover hover-zoom" 
+                          style={{ transition: 'transform 0.3s ease' }}
+                        />
+                      </div>
+                    )}
                     <h4 className="science-font fs-5 fw-bold text-dark mb-2">{cat.name}</h4>
                     <p className="text-muted small mb-4">{cat.description}</p>
                     <Link to={`/categories`} className="text-success text-decoration-none mt-auto fw-bold small">
