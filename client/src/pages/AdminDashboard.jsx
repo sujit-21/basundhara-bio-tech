@@ -67,18 +67,18 @@ const AdminDashboard = () => {
     setLoading(true);
     try {
       const [statsRes, categoriesRes, productsRes, researchRes, ieRes, contactsRes, officesRes, ordersRes, aboutRes, aboutSecRes, galleryRes, companyStatsRes] = await Promise.all([
-        api.get('/admin/stats'),
-        api.get('/categories?all=true&limit=100'),
-        api.get('/products?all=true&limit=100'),
-        api.get('/research?all=true&limit=100'),
-        api.get('/importexport?all=true&limit=100'),
-        api.get('/contacts?all=true&limit=100'),
-        api.get('/offices?all=true&limit=100'),
-        api.get('/orders?all=true&limit=100'),
+        api.get('/analytics'),
+        api.get('/categories'),
+        api.get('/products?limit=100'),
+        api.get('/research?limit=100'),
+        api.get('/importexport'),
+        api.get('/contacts?limit=100'),
+        api.get('/offices'),
+        api.get('/orders?limit=100'),
         api.get('/about'),
-        api.get('/about-sections?all=true&limit=100'),
-        api.get('/gallery?all=true&limit=100'),
-        api.get('/admin/company-stats')
+        api.get('/about-sections'),
+        api.get('/gallery'),
+        api.get('/company-stats')
       ]);
 
       if (statsRes.data.success) setStats(statsRes.data.data);
