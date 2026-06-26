@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import ImageCarousel from '../components/ImageCarousel';
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
@@ -73,14 +74,11 @@ const Categories = () => {
               <div className="col-lg-4 col-md-6" key={cat._id}>
                 <div className="card glass-card h-100 p-4 border border-secondary border-opacity-10 d-flex flex-column">
                   {(cat.image || (cat.images && cat.images.length > 0)) && (
-                    <div className="mb-4 rounded overflow-hidden" style={{ height: '200px' }}>
-                      <img 
-                        src={cat.image || cat.images[0]} 
-                        alt={cat.name} 
-                        className="w-100 h-100 object-fit-cover hover-zoom" 
-                        style={{ transition: 'transform 0.3s ease' }}
-                      />
-                    </div>
+                    <ImageCarousel 
+                      images={cat.images && cat.images.length > 0 ? cat.images : [cat.image]} 
+                      altText={cat.name} 
+                      height="200px" 
+                    />
                   )}
                   <div className="d-flex align-items-center gap-3 mb-3">
                     {!(cat.image || (cat.images && cat.images.length > 0)) && (

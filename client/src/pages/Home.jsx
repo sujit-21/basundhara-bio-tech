@@ -4,6 +4,7 @@ import img1 from '../homepage_image/moringa leaves.jpg';
 import img2 from '../homepage_image/moringa leaves2.jpg';
 import img3 from '../homepage_image/moringa leaves3.jpeg';
 import api from '../services/api';
+import ImageCarousel from '../components/ImageCarousel';
 
 const Home = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
@@ -132,14 +133,11 @@ const Home = () => {
                 <div className="col-lg-3 col-md-6" key={cat._id}>
                   <div className="card glass-card h-100 p-4 border border-secondary border-opacity-10 text-start">
                     {(cat.image || (cat.images && cat.images.length > 0)) && (
-                      <div className="mb-3 rounded overflow-hidden" style={{ height: '150px' }}>
-                        <img 
-                          src={cat.image || cat.images[0]} 
-                          alt={cat.name} 
-                          className="w-100 h-100 object-fit-cover hover-zoom" 
-                          style={{ transition: 'transform 0.3s ease' }}
-                        />
-                      </div>
+                      <ImageCarousel 
+                        images={cat.images && cat.images.length > 0 ? cat.images : [cat.image]} 
+                        altText={cat.name} 
+                        height="150px" 
+                      />
                     )}
                     <h4 className="science-font fs-5 fw-bold text-dark mb-2">{cat.name}</h4>
                     <p className="text-muted small mb-4">{cat.description}</p>
@@ -174,12 +172,13 @@ const Home = () => {
               {featuredProducts.map((prod) => (
                 <div className="col-lg-4 col-md-6" key={prod._id}>
                   <div className="card h-100 p-3 border border-secondary border-opacity-20 text-start" style={{ background: 'rgba(15, 23, 42, 0.4)', borderRadius: '16px' }}>
-                    <img
-                      src={prod.image}
-                      alt={prod.title}
-                      className="img-fluid rounded mb-3 object-fit-cover"
-                      style={{ height: '200px', width: '100%' }}
-                    />
+                    {(prod.image || (prod.images && prod.images.length > 0)) && (
+                      <ImageCarousel 
+                        images={prod.images && prod.images.length > 0 ? prod.images : [prod.image]} 
+                        altText={prod.title} 
+                        height="200px" 
+                      />
+                    )}
                     <div className="d-flex justify-content-between align-items-center mb-2">
                       <span className="badge bg-success bg-opacity-20 text-success text-xs px-2.5 py-1">{prod.category?.name}</span>
                       <span className="text-secondary small font-monospace">{prod.price}</span>
