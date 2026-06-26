@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const Category = require('../models/Category');
 const Product = require('../models/Product');
-const Blog = require('../models/Blog');
+
 const Research = require('../models/Research');
 const Contact = require('../models/Contact');
 const ImportExport = require('../models/ImportExport');
@@ -15,7 +15,7 @@ const getAdminStats = async (req, res, next) => {
     const userCount = await User.countDocuments({});
     const categoryCount = await Category.countDocuments({});
     const productCount = await Product.countDocuments({});
-    const blogCount = await Blog.countDocuments({});
+
     const researchCount = await Research.countDocuments({});
     const contactCount = await Contact.countDocuments({});
     const importExportCount = await ImportExport.countDocuments({});
@@ -62,7 +62,7 @@ const getAdminStats = async (req, res, next) => {
           users: userCount,
           categories: categoryCount,
           products: productCount,
-          blogs: blogCount,
+
           research: researchCount,
           contacts: contactCount,
           importExport: importExportCount,
