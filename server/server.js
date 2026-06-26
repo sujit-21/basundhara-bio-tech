@@ -11,7 +11,7 @@ const { errorHandler } = require('./middleware/errorMiddleware');
 const authRoutes = require('./routes/authRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const productRoutes = require('./routes/productRoutes');
-const blogRoutes = require('./routes/blogRoutes');
+
 const researchRoutes = require('./routes/researchRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const importexportRoutes = require('./routes/importexportRoutes');
@@ -59,7 +59,7 @@ app.use('/api/', apiLimiter);
 app.use(['/api/auth', '/auth'], authRoutes);
 app.use(['/api/categories', '/categories'], categoryRoutes);
 app.use(['/api/products', '/products'], productRoutes);
-app.use(['/api/blogs', '/blogs'], blogRoutes);
+
 app.use(['/api/research', '/research'], researchRoutes);
 app.use(['/api/contacts', '/contacts'], contactRoutes);
 app.use(['/api/importexport', '/importexport'], importexportRoutes);

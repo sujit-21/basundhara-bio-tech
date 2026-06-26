@@ -76,9 +76,7 @@ const Navbar = () => {
                 <li><NavLink className={({ isActive }) => `dropdown-item ${isActive ? 'text-success bg-light' : ''}`} to="/importexport">Import-Export</NavLink></li>
               </ul>
             </li>
-            <li className="nav-item">
-              <NavLink className={({ isActive }) => `nav-link fw-semibold ${isActive ? 'text-success' : ''}`} to="/blog">Blog</NavLink>
-            </li>
+
             <li className="nav-item">
               <NavLink className={({ isActive }) => `nav-link fw-semibold ${isActive ? 'text-success' : ''}`} to="/contact">Contact</NavLink>
             </li>

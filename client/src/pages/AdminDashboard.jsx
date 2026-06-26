@@ -15,7 +15,7 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
-  const [blogs, setBlogs] = useState([]);
+
   const [research, setResearch] = useState([]);
   const [importExport, setImportExport] = useState([]);
   const [contacts, setContacts] = useState([]);
@@ -43,7 +43,7 @@ const AdminDashboard = () => {
   const [productForm, setProductForm] = useState({ title: '', description: '', price: 'On Inquiry', image: '', images: [], category: '', subCategory: '', specifications: '', inStock: true });
   const [productImageUrlInput, setProductImageUrlInput] = useState('');
   const [importExportForm, setImportExportForm] = useState({ title: '', description: '', destinationCountries: '', shippingModes: '', status: 'active' });
-  const [blogForm, setBlogForm] = useState({ title: '', content: '', author: 'Dr. Basundhara Roy', tags: '', image: '', published: true });
+
   const [researchForm, setResearchForm] = useState({ title: '', abstract: '', authors: '', journal: '', publishDate: '', doi: '', pdfUrl: '/sample_research.pdf', category: 'Biofuels & Sustainability' });
   const [offices, setOffices] = useState([]);
   const [officeForm, setOfficeForm] = useState({ title: '', address: '', phone: '', email: '' });
@@ -66,26 +66,24 @@ const AdminDashboard = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [statsRes, categoriesRes, productsRes, blogsRes, researchRes, ieRes, contactsRes, officesRes, ordersRes, aboutRes, aboutSecRes, galleryRes, companyStatsRes] = await Promise.all([
-        api.get('/analytics'),
-        api.get('/categories'),
-        api.get('/products?limit=100'),
-        api.get('/blogs?all=true&limit=100'),
-        api.get('/research?limit=100'),
-        api.get('/importexport'),
-        api.get('/contacts?limit=100'),
-        api.get('/offices'),
-        api.get('/orders?limit=100'),
+      const [statsRes, categoriesRes, productsRes, researchRes, ieRes, contactsRes, officesRes, ordersRes, aboutRes, aboutSecRes, galleryRes, companyStatsRes] = await Promise.all([
+        api.get('/admin/stats'),
+        api.get('/categories?all=true&limit=100'),
+        api.get('/products?all=true&limit=100'),
+        api.get('/research?all=true&limit=100'),
+        api.get('/importexport?all=true&limit=100'),
+        api.get('/contacts?all=true&limit=100'),
+        api.get('/offices?all=true&limit=100'),
+        api.get('/orders?all=true&limit=100'),
         api.get('/about'),
-        api.get('/about-sections'),
-        api.get('/gallery'),
-        api.get('/company-stats'),
+        api.get('/about-sections?all=true&limit=100'),
+        api.get('/gallery?all=true&limit=100'),
+        api.get('/admin/company-stats')
       ]);
 
       if (statsRes.data.success) setStats(statsRes.data.data);
       if (categoriesRes.data.success) setCategories(categoriesRes.data.data);
       if (productsRes.data.success) setProducts(productsRes.data.data);
-      if (blogsRes.data.success) setBlogs(blogsRes.data.data);
       if (researchRes.data.success) setResearch(researchRes.data.data);
       if (ieRes.data.success) setImportExport(ieRes.data.data);
       if (contactsRes.data.success) setContacts(contactsRes.data.data);
@@ -177,24 +175,6 @@ const AdminDashboard = () => {
       loadData();
     } catch (err) {
       triggerAlert(err.response?.data?.message || 'Freight lane action failed.', 'danger');
-    }
-  };
-
-  // Submit Blog
-  const handleBlogSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      if (isEditMode) {
-        await api.put(`/blogs/${currentItem._id}`, blogForm);
-        triggerAlert('Blog post updated.');
-      } else {
-        await api.post('/blogs', blogForm);
-        triggerAlert('Blog post published.');
-      }
-      setShowForm(false);
-      loadData();
-    } catch (err) {
-      triggerAlert(err.response?.data?.message || 'Blog action failed.', 'danger');
     }
   };
 
@@ -395,8 +375,7 @@ const AdminDashboard = () => {
       setProductImageUrlInput('');
     } else if (type === 'importexport') {
       setImportExportForm({ title: '', description: '', destinationCountries: '', shippingModes: 'Sea Freight (FCL)', status: 'active' });
-    } else if (type === 'blogs') {
-      setBlogForm({ title: '', content: '', author: 'Dr. Basundhara Roy', tags: 'Agro-Tech, Innovation', image: '', published: true });
+
     } else if (type === 'research') {
       setResearchForm({ title: '', abstract: '', authors: 'Roy, B.', journal: 'Sustainable Agriculture Journal', publishDate: new Date().toISOString().split('T')[0], doi: '', pdfUrl: '/sample_research.pdf', category: 'Biofuels & Sustainability' });
     } else if (type === 'offices') {
@@ -427,8 +406,7 @@ const AdminDashboard = () => {
       setProductImageUrlInput('');
     } else if (type === 'importexport') {
       setImportExportForm({ title: item.title, description: item.description, destinationCountries: (item.destinationCountries || []).join(', '), shippingModes: (item.shippingModes || []).join(', '), status: item.status });
-    } else if (type === 'blogs') {
-      setBlogForm({ title: item.title, content: item.content, author: item.author, tags: (item.tags || []).join(', '), image: item.image, published: item.published });
+
     } else if (type === 'research') {
       setResearchForm({ title: item.title, abstract: item.abstract, authors: item.authors, journal: item.journal, publishDate: item.publishDate ? item.publishDate.split('T')[0] : '', doi: item.doi, pdfUrl: item.pdfUrl, category: item.category });
     } else if (type === 'offices') {
@@ -611,9 +589,6 @@ const AdminDashboard = () => {
               <button onClick={() => { setActiveTab('orders'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent ${activeTab === 'orders' ? 'active' : ''}`}>
                 <i className="bi bi-receipt-cutoff me-2"></i> Orders
                 {stats?.orders?.pending > 0 && <span className="badge bg-danger ms-2">{stats.orders.pending}</span>}
-              </button>
-              <button onClick={() => { setActiveTab('blogs'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent ${activeTab === 'blogs' ? 'active' : ''}`}>
-                <i className="bi bi-journal-text me-2"></i> Blogs
               </button>
               <button onClick={() => { setActiveTab('messages'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent ${activeTab === 'messages' ? 'active' : ''}`}>
                 <i className="bi bi-chat-left-text-fill me-2"></i> Inquiries 
@@ -1371,89 +1346,7 @@ const AdminDashboard = () => {
                   </div>
                 )}
 
-                {/* --- TAB: MANAGE BLOGS --- */}
-                {activeTab === 'blogs' && (
-                  <div>
-                    {!showForm ? (
-                      <div>
-                        <div className="d-flex justify-content-between align-items-center mb-3">
-                          <h3 className="science-font fs-4 fw-bold">Scientific Blogs ({blogs.length})</h3>
-                          <button onClick={() => openAddForm('blogs')} className="btn btn-sm btn-success">
-                            <i className="bi bi-plus-circle me-1"></i> Add Blog Post
-                          </button>
-                        </div>
-                        <div className="table-responsive">
-                          <table className="table custom-table align-middle">
-                            <thead>
-                              <tr>
-                                <th>Blog Title</th>
-                                <th>Author</th>
-                                <th>Tags</th>
-                                <th>Published</th>
-                                <th>Created</th>
-                                <th>Actions</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {blogs.map((b) => (
-                                <tr key={b._id}>
-                                  <td><span className="fw-semibold text-dark">{b.title}</span></td>
-                                  <td>{b.author}</td>
-                                  <td>{(b.tags || []).map(t => <span key={t} className="badge bg-secondary bg-opacity-10 text-secondary me-1 text-xs">#{t}</span>)}</td>
-                                  <td>{b.published ? <span className="text-success"><i className="bi bi-check-circle-fill"></i></span> : <span className="text-warning">Draft</span>}</td>
-                                  <td className="small">{new Date(b.createdAt).toLocaleDateString()}</td>
-                                  <td>
-                                    <div className="d-flex gap-2">
-                                      <button onClick={() => openEditForm('blogs', b)} className="btn btn-xs btn-outline-primary py-1 px-2.5 small"><i className="bi bi-pencil-square"></i></button>
-                                      <button onClick={() => handleDelete('/blogs', b._id)} className="btn btn-xs btn-outline-danger py-1 px-2.5 small"><i className="bi bi-trash"></i></button>
-                                    </div>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    ) : (
-                      // Add/Edit Blog Form
-                      <div className="card glass-card p-4 max-w-xl mx-auto" style={{ maxWidth: '650px', margin: '0 auto' }}>
-                        <h4 className="science-font fw-bold mb-4">{isEditMode ? 'Modify Blog Draft' : 'Publish New Blog Post'}</h4>
-                        <form onSubmit={handleBlogSubmit}>
-                          <div className="mb-3">
-                            <label className="form-label small fw-bold">Title</label>
-                            <input type="text" className="form-control" value={blogForm.title} onChange={e => setBlogForm({ ...blogForm, title: e.target.value })} required />
-                          </div>
-                          <div className="row mb-3">
-                            <div className="col-md-6">
-                              <label className="form-label small fw-bold">Author</label>
-                              <input type="text" className="form-control" value={blogForm.author} onChange={e => setBlogForm({ ...blogForm, author: e.target.value })} required />
-                            </div>
-                            <div className="col-md-6">
-                              <label className="form-label small fw-bold">Tags (comma separated)</label>
-                              <input type="text" className="form-control" value={blogForm.tags} onChange={e => setBlogForm({ ...blogForm, tags: e.target.value })} />
-                            </div>
-                          </div>
-                          <div className="mb-3">
-                            <label className="form-label small fw-bold">Cover Image URL</label>
-                            <input type="text" className="form-control" value={blogForm.image} onChange={e => setBlogForm({ ...blogForm, image: e.target.value })} />
-                          </div>
-                          <div className="mb-3">
-                            <label className="form-label small fw-bold">Article Content</label>
-                            <textarea className="form-control" rows="8" value={blogForm.content} onChange={e => setBlogForm({ ...blogForm, content: e.target.value })} required></textarea>
-                          </div>
-                          <div className="form-check form-switch mb-4">
-                            <input className="form-check-input" type="checkbox" role="switch" id="publishedSwitch" checked={blogForm.published} onChange={e => setBlogForm({ ...blogForm, published: e.target.checked })} />
-                            <label className="form-check-label small fw-bold" htmlFor="publishedSwitch">Publish Immediately</label>
-                          </div>
-                          <div className="d-flex gap-2">
-                            <button type="submit" className="btn btn-science-primary">Publish Article</button>
-                            <button type="button" onClick={() => setShowForm(false)} className="btn btn-secondary">Cancel</button>
-                          </div>
-                        </form>
-                      </div>
-                    )}
-                  </div>
-                )}
+
 
                 {/* --- TAB: MANAGE RESEARCH --- */}
                 {activeTab === 'research' && (
