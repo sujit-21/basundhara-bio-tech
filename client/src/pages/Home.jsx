@@ -209,33 +209,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 5. Circular Economy / Upcycling Callout */}
-      <section className="py-5">
-        <div className="container">
-          <div className="row align-items-center g-5 text-start">
-            <div className="col-lg-6">
-              <span className="badge bg-success bg-opacity-10 text-success px-3 py-1.5 rounded-pill science-font mb-3">Circular Economy</span>
-              <h2 className="science-font fw-bold text-dark mb-4">Upcycling Agricultural Waste into Biodegradable Products</h2>
-              <p className="text-muted mb-4">
-                At Basundhara, sustainability is not just a catchphrase; it is a structural commitment. Our Recycling & Waste Management division aggregates organic agricultural residues—such as coconut coir husks and crop stems—and upcycles them into biodegradable nursery planting pots.
-              </p>
-              <ul className="list-unstyled d-flex flex-column gap-2 mb-4 text-muted small">
-                <li><i className="bi bi-check-circle-fill text-success me-2"></i> Zero chemical binders or synthetic polymers</li>
-                <li><i className="bi bi-check-circle-fill text-success me-2"></i> Biodegrades directly in soils to eliminate plastic wraps</li>
-                <li><i className="bi bi-check-circle-fill text-success me-2"></i> Empowers farm communities through residue buyback schemes</li>
-              </ul>
-              <Link to="/sustainability" className="btn btn-success">View Recycling Projects</Link>
-            </div>
-            <div className="col-lg-6">
-              <div className="card glass-card p-5 text-center border-0" style={{ background: 'linear-gradient(135deg, rgba(76,175,80,0.05), rgba(217,119,6,0.05))', borderRadius: '24px' }}>
-                <i className="bi bi-recycle fs-1 text-success mb-3 animate-spin"></i>
-                <h4 className="science-font fw-bold text-dark mb-2">Composting & Waste Recovery</h4>
-                <p className="text-muted small">We convert 100% of organic processing waste back into soil stimulant composts, returning critical trace nutrients to the crops.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+
 
       {/* 6. Import/Export Route Teaser */}
       <section className="py-5 bg-gradient-light">
