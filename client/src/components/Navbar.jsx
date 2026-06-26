@@ -62,7 +62,7 @@ const Navbar = () => {
               <ul className="dropdown-menu border-0 shadow" aria-labelledby="companyDropdown">
                 <li><NavLink className={({ isActive }) => `dropdown-item ${isActive ? 'text-success bg-light' : ''}`} to="/about">About</NavLink></li>
                 <li><NavLink className={({ isActive }) => `dropdown-item ${isActive ? 'text-success bg-light' : ''}`} to="/research">Research</NavLink></li>
-                <li><NavLink className={({ isActive }) => `dropdown-item ${isActive ? 'text-success bg-light' : ''}`} to="/sustainability">Sustainability</NavLink></li>
+
                 <li><NavLink className={({ isActive }) => `dropdown-item ${isActive ? 'text-success bg-light' : ''}`} to="/gallery">Gallery</NavLink></li>
               </ul>
             </li>

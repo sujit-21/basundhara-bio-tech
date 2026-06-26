@@ -61,7 +61,7 @@ const Footer = () => {
               <li><Link to="/about" className="text-secondary text-decoration-none hover-text-success">About Us</Link></li>
               <li><Link to="/categories" className="text-secondary text-decoration-none hover-text-success">Industry Sectors</Link></li>
               <li><Link to="/products" className="text-secondary text-decoration-none hover-text-success">Product Catalog</Link></li>
-              <li><Link to="/sustainability" className="text-secondary text-decoration-none hover-text-success">Recycling & Green Projects</Link></li>
+
               <li><Link to="/importexport" className="text-secondary text-decoration-none hover-text-success">Import-Export Services</Link></li>
             </ul>
           </div>

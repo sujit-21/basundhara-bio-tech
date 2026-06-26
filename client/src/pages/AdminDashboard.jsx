@@ -22,7 +22,6 @@ const AdminDashboard = () => {
   const [aboutList, setAboutList] = useState([]);
   const [aboutSections, setAboutSections] = useState([]);
   const [gallery, setGallery] = useState([]);
-  const [sustainability, setSustainability] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orderSearch, setOrderSearch] = useState('');
   const [orderStatusFilter, setOrderStatusFilter] = useState('');
@@ -57,8 +56,6 @@ const AdminDashboard = () => {
   // Gallery & Sustainability forms
   const [galleryForm, setGalleryForm] = useState({ title: '', description: '', category: 'Farms', images: [], order: 0 });
   const [galleryImageUrlInput, setGalleryImageUrlInput] = useState('');
-  const [sustainabilityForm, setSustainabilityForm] = useState({ type: 'initiative', title: '', description: '', impact: '', icon: 'bi-recycle', order: 0 });
-  const [sustainabilitySubTab, setSustainabilitySubTab] = useState('hero');
 
   const triggerAlert = (message, type = 'success') => {
     setAlertInfo({ show: true, message, type });
@@ -68,7 +65,7 @@ const AdminDashboard = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [statsRes, categoriesRes, productsRes, blogsRes, researchRes, ieRes, contactsRes, officesRes, ordersRes, aboutRes, aboutSecRes, galleryRes, sustainabilityRes, companyStatsRes] = await Promise.all([
+      const [statsRes, categoriesRes, productsRes, blogsRes, researchRes, ieRes, contactsRes, officesRes, ordersRes, aboutRes, aboutSecRes, galleryRes, companyStatsRes] = await Promise.all([
         api.get('/analytics'),
         api.get('/categories'),
         api.get('/products?limit=100'),
@@ -81,7 +78,6 @@ const AdminDashboard = () => {
         api.get('/about'),
         api.get('/about-sections'),
         api.get('/gallery'),
-        api.get('/sustainability'),
         api.get('/company-stats'),
       ]);
 
@@ -97,7 +93,6 @@ const AdminDashboard = () => {
       if (aboutRes.data.success) setAboutList(aboutRes.data.data);
       if (aboutSecRes.data.success) setAboutSections(aboutSecRes.data.data);
       if (galleryRes.data.success) setGallery(galleryRes.data.data);
-      if (sustainabilityRes.data.success) setSustainability(sustainabilityRes.data.data);
       if (companyStatsRes.data.success) setCompanyStats(companyStatsRes.data.data);
     } catch (err) {
       console.error(err);
@@ -315,24 +310,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // Submit Sustainability Item
-  const handleSustainabilitySubmit = async (e) => {
-    e.preventDefault();
-    try {
-      if (isEditMode) {
-        await api.put(`/sustainability/${currentItem._id}`, sustainabilityForm);
-        triggerAlert('Sustainability specifications updated.');
-      } else {
-        await api.post('/sustainability', sustainabilityForm);
-        triggerAlert('Sustainability item created successfully.');
-      }
-      setShowForm(false);
-      loadData();
-    } catch (err) {
-      triggerAlert(err.response?.data?.message || 'Sustainability action failed.', 'danger');
-    }
-  };
-
   // Gallery multi image upload
   const handleGalleryImageUpload = (e) => {
     const files = Array.from(e.target.files || []);
@@ -439,8 +416,6 @@ const AdminDashboard = () => {
     } else if (type === 'gallery') {
       setGalleryForm({ title: '', description: '', category: 'Farms', images: [], order: 0 });
       setGalleryImageUrlInput('');
-    } else if (type === 'sustainability') {
-      setSustainabilityForm({ type: extra || 'initiative', title: '', description: '', impact: '', icon: 'bi-recycle', order: 0 });
     }
   };
 
@@ -473,8 +448,6 @@ const AdminDashboard = () => {
     } else if (type === 'gallery') {
       setGalleryForm({ title: item.title, description: item.description, category: item.category, images: item.images || (item.image ? [item.image] : []), order: item.order || 0 });
       setGalleryImageUrlInput('');
-    } else if (type === 'sustainability') {
-      setSustainabilityForm({ type: item.type, title: item.title, description: item.description, impact: item.impact || '', icon: item.icon || 'bi-recycle', order: item.order || 0 });
     }
   };
 
@@ -622,9 +595,6 @@ const AdminDashboard = () => {
                     </button>
                     <button onClick={() => { setActiveTab('research'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent py-1 ${activeTab === 'research' ? 'active text-success fw-bold' : 'text-muted'}`}>
                       Research
-                    </button>
-                    <button onClick={() => { setActiveTab('sustainability'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent py-1 ${activeTab === 'sustainability' ? 'active text-success fw-bold' : 'text-muted'}`}>
-                      Sustainability
                     </button>
                     <button onClick={() => { setActiveTab('gallery'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent py-1 ${activeTab === 'gallery' ? 'active text-success fw-bold' : 'text-muted'}`}>
                       Gallery
@@ -2267,168 +2237,6 @@ const AdminDashboard = () => {
                   </div>
                 )}
 
-                {/* --- TAB: SUSTAINABILITY --- */}
-                {activeTab === 'sustainability' && (
-                  <div>
-                    {/* Inner Sub-Tabs Navigation */}
-                    <div className="d-flex gap-2 mb-4 border-bottom pb-2">
-                      <button
-                        type="button"
-                        className={`btn btn-sm rounded-pill px-3 py-1.5 fw-semibold ${sustainabilitySubTab === 'hero' ? 'btn-success text-white' : 'btn-light border border-secondary border-opacity-10 text-dark'}`}
-                        onClick={() => { setSustainabilitySubTab('hero'); setShowForm(false); }}
-                      >
-                        <i className="bi bi-window-sidebar me-1.5"></i> Hero Card
-                      </button>
-                      <button
-                        type="button"
-                        className={`btn btn-sm rounded-pill px-3 py-1.5 fw-semibold ${sustainabilitySubTab === 'initiative' ? 'btn-success text-white' : 'btn-light border border-secondary border-opacity-10 text-dark'}`}
-                        onClick={() => { setSustainabilitySubTab('initiative'); setShowForm(false); }}
-                      >
-                        <i className="bi bi-recycle me-1.5"></i> Circularity Initiatives
-                      </button>
-                    </div>
-
-                    {!showForm ? (
-                      <div>
-                        {sustainabilitySubTab === 'hero' ? (
-                          <div>
-                            <div className="d-flex justify-content-between align-items-center mb-3">
-                              <h4 className="science-font fs-5 fw-bold text-dark mb-0">Sustainability target (Hero) ({sustainability.filter(s => s.type === 'hero').length})</h4>
-                              {sustainability.filter(s => s.type === 'hero').length === 0 && (
-                                <button onClick={() => openAddForm('sustainability', 'hero')} className="btn btn-sm btn-success">
-                                  <i className="bi bi-plus-circle me-1"></i> Add Hero Target
-                                </button>
-                              )}
-                            </div>
-                            <div className="table-responsive">
-                              <table className="table custom-table align-middle">
-                                <thead>
-                                  <tr>
-                                    <th>Target Title</th>
-                                    <th>Main Description</th>
-                                    <th>Certification</th>
-                                    <th>Certification Icon</th>
-                                    <th>Actions</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {sustainability.filter(s => s.type === 'hero').map((h) => (
-                                    <tr key={h._id}>
-                                      <td><span className="fw-semibold text-dark">{h.title}</span></td>
-                                      <td className="small text-muted" style={{ maxWidth: '350px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{h.description}</td>
-                                      <td><span className="badge bg-success bg-opacity-10 text-success fw-bold">{h.impact || 'Zero Waste Certified'}</span></td>
-                                      <td className="font-monospace small text-dark"><i className={`bi ${h.icon || 'bi-shield-fill-check'} me-1.5`}></i>{h.icon || 'bi-shield-fill-check'}</td>
-                                      <td>
-                                        <div className="d-flex gap-2">
-                                          <button onClick={() => openEditForm('sustainability', h)} className="btn btn-xs btn-outline-primary py-1 px-2.5 small"><i className="bi bi-pencil-square"></i></button>
-                                          <button onClick={() => handleDelete('/sustainability', h._id)} className="btn btn-xs btn-outline-danger py-1 px-2.5 small"><i className="bi bi-trash"></i></button>
-                                        </div>
-                                      </td>
-                                    </tr>
-                                  ))}
-                                  {sustainability.filter(s => s.type === 'hero').length === 0 && (
-                                    <tr>
-                                      <td colSpan="5" className="text-center py-4 text-muted">No Hero target configured yet. Add one to customize the Sustainability Page Header Card.</td>
-                                    </tr>
-                                  )}
-                                </tbody>
-                              </table>
-                            </div>
-                          </div>
-                        ) : (
-                          <div>
-                            <div className="d-flex justify-content-between align-items-center mb-3">
-                              <h4 className="science-font fs-5 fw-bold text-dark mb-0">Circularity Initiatives ({sustainability.filter(s => s.type === 'initiative').length})</h4>
-                              <button onClick={() => openAddForm('sustainability', 'initiative')} className="btn btn-sm btn-success">
-                                <i className="bi bi-plus-circle me-1"></i> Add Initiative Card
-                              </button>
-                            </div>
-                            <div className="table-responsive">
-                              <table className="table custom-table align-middle">
-                                <thead>
-                                  <tr>
-                                    <th>Icon</th>
-                                    <th>Initiative Title</th>
-                                    <th>Description Details</th>
-                                    <th>Impact Summary</th>
-                                    <th>Order</th>
-                                    <th>Actions</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {sustainability.filter(s => s.type === 'initiative').map((s) => (
-                                    <tr key={s._id}>
-                                      <td>
-                                        <div className="d-inline-flex justify-content-center align-items-center rounded bg-success bg-opacity-10 text-success p-2" style={{ width: '40px', height: '40px' }}>
-                                          <i className={`bi ${s.icon || 'bi-recycle'} fs-5`}></i>
-                                        </div>
-                                      </td>
-                                      <td><span className="fw-semibold text-dark">{s.title}</span></td>
-                                      <td className="small text-muted" style={{ maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.description}</td>
-                                      <td className="small fw-semibold text-success">{s.impact}</td>
-                                      <td className="font-monospace">{s.order}</td>
-                                      <td>
-                                        <div className="d-flex gap-2">
-                                          <button onClick={() => openEditForm('sustainability', s)} className="btn btn-xs btn-outline-primary py-1 px-2.5 small"><i className="bi bi-pencil-square"></i></button>
-                                          <button onClick={() => handleDelete('/sustainability', s._id)} className="btn btn-xs btn-outline-danger py-1 px-2.5 small"><i className="bi bi-trash"></i></button>
-                                        </div>
-                                      </td>
-                                    </tr>
-                                  ))}
-                                  {sustainability.filter(s => s.type === 'initiative').length === 0 && (
-                                    <tr>
-                                      <td colSpan="6" className="text-center py-4 text-muted">No initiatives registered yet.</td>
-                                    </tr>
-                                  )}
-                                </tbody>
-                              </table>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      // Add/Edit Sustainability Form
-                      <div className="card glass-card p-4 max-w-xl mx-auto text-start" style={{ maxWidth: '650px', margin: '0 auto' }}>
-                        <h4 className="science-font fw-bold mb-4">
-                          {isEditMode ? 'Modify Sustainability specs' : 'Add Sustainability item'} ({sustainabilitySubTab === 'hero' ? 'Hero Card' : 'Initiative Card'})
-                        </h4>
-                        <form onSubmit={handleSustainabilitySubmit}>
-                          <div className="row mb-3">
-                            <div className="col-md-6">
-                              <label className="form-label small fw-bold text-dark">Title</label>
-                              <input type="text" className="form-control" value={sustainabilityForm.title} onChange={e => setSustainabilityForm({ ...sustainabilityForm, title: e.target.value })} required placeholder={sustainabilitySubTab === 'hero' ? "e.g. Our Goal: Zero Industrial Agro-Waste" : "e.g. Agricultural Coir Upcycling"} />
-                            </div>
-                            <div className="col-md-6">
-                              <label className="form-label small fw-bold text-dark">Bootstrap Icon Class</label>
-                              <input type="text" className="form-control" value={sustainabilityForm.icon} onChange={e => setSustainabilityForm({ ...sustainabilityForm, icon: e.target.value })} required placeholder="e.g. bi-recycle, bi-sun-fill, bi-shield-fill-check" />
-                            </div>
-                          </div>
-
-                          <div className="row mb-3">
-                            <div className="col-md-6">
-                              <label className="form-label small fw-bold text-dark">{sustainabilitySubTab === 'hero' ? "Certification text" : "Impact statement"}</label>
-                              <input type="text" className="form-control" value={sustainabilityForm.impact} onChange={e => setSustainabilityForm({ ...sustainabilityForm, impact: e.target.value })} required placeholder={sustainabilitySubTab === 'hero' ? "e.g. Zero Waste Certified" : "e.g. 120 Metric Tons of husk waste diverted annually"} />
-                            </div>
-                            <div className="col-md-6">
-                              <label className="form-label small fw-bold text-dark">Display Order (Sorting)</label>
-                              <input type="number" className="form-control" value={sustainabilityForm.order} onChange={e => setSustainabilityForm({ ...sustainabilityForm, order: Number(e.target.value) })} required />
-                            </div>
-                          </div>
-
-                          <div className="mb-4">
-                            <label className="form-label small fw-bold text-dark">Detailed Description content</label>
-                            <textarea className="form-control" rows="4" value={sustainabilityForm.description} onChange={e => setSustainabilityForm({ ...sustainabilityForm, description: e.target.value })} required placeholder="Write the main description details here..."></textarea>
-                          </div>
-
-                          <div className="d-flex gap-2">
-                            <button type="submit" className="btn btn-success px-4">Save Specifications</button>
-                            <button type="button" onClick={() => setShowForm(false)} className="btn btn-secondary px-3">Cancel</button>
-                          </div>
-                        </form>
-                      </div>
-                    )}
-                  </div>
-                )}
               </>
             )}
 

@@ -12,7 +12,7 @@ import About from './pages/About';
 import Categories from './pages/Categories';
 import Products from './pages/Products';
 import Research from './pages/Research';
-import Sustainability from './pages/Sustainability';
+
 import ImportExport from './pages/ImportExport';
 import Gallery from './pages/Gallery';
 import Blog from './pages/Blog';
@@ -38,7 +38,7 @@ function App() {
               <Route path="/categories" element={<Categories />} />
               <Route path="/products" element={<Products />} />
               <Route path="/research" element={<Research />} />
-              <Route path="/sustainability" element={<Sustainability />} />
+
               <Route path="/importexport" element={<ImportExport />} />
               <Route path="/gallery" element={<Gallery />} />
               <Route path="/blog" element={<Blog />} />
