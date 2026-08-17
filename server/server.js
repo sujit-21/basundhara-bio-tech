@@ -26,9 +26,19 @@ const companyStatRoutes = require('./routes/companyStatRoutes');
 
 
 // Connect to Database
-connectDB();
+connectDB().catch(err => console.error('Initial DB Connection Error:', err));
 
 const app = express();
+
+// Ensure DB is connected before handling requests
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Database connection error: ' + err.message });
+  }
+});
 
 // Security & Request Limit Middleware
 app.use(cors({

@@ -43,29 +43,32 @@ const AdminLogin = () => {
     }
 
     setSubmitting(true);
-    const result = await login(email, password);
-    setSubmitting(false);
+    try {
+      const result = await login(email.trim(), password);
+      setSubmitting(false);
 
-    if (result.success) {
-      // Handle Remember Me persistence
-      if (rememberMe) {
-        localStorage.setItem('rememberedAdminEmail', email);
-        localStorage.setItem('rememberedAdminPassword', password);
-      } else {
-        localStorage.removeItem('rememberedAdminEmail');
-        localStorage.removeItem('rememberedAdminPassword');
-      }
+      if (result && result.success) {
+        if (rememberMe) {
+          localStorage.setItem('rememberedAdminEmail', email);
+          localStorage.setItem('rememberedAdminPassword', password);
+        } else {
+          localStorage.removeItem('rememberedAdminEmail');
+          localStorage.removeItem('rememberedAdminPassword');
+        }
 
-      // Verify admin role
-      const currentUser = JSON.parse(localStorage.getItem('userInfo') || '{}');
-      if (currentUser?.role !== 'admin') {
-        logout();
-        setErrorMsg('Access Denied: Administrator clearance required for this portal.');
+        const currentUser = JSON.parse(localStorage.getItem('userInfo') || '{}');
+        if (currentUser?.role !== 'admin') {
+          logout();
+          setErrorMsg('Access Denied: Administrator clearance required for this portal.');
+        } else {
+          navigate('/admin');
+        }
       } else {
-        navigate('/admin');
+        setErrorMsg(result?.message || 'Invalid administrator credentials.');
       }
-    } else {
-      setErrorMsg(result.message || 'Invalid administrator credentials.');
+    } catch (err) {
+      setSubmitting(false);
+      setErrorMsg(err.message || 'Login request failed.');
     }
   };
 

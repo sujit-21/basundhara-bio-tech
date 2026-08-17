@@ -45,19 +45,31 @@ const Login = () => {
     }
 
     setSubmitting(true);
-    const result = await login(email, password);
-    setSubmitting(false);
+    try {
+      const result = await login(email.trim(), password);
+      setSubmitting(false);
 
-    if (result.success) {
-      if (rememberMe) {
-        localStorage.setItem('rememberedEmail', email);
-        localStorage.setItem('rememberedPassword', password);
+      if (result && result.success) {
+        if (rememberMe) {
+          localStorage.setItem('rememberedEmail', email);
+          localStorage.setItem('rememberedPassword', password);
+        } else {
+          localStorage.removeItem('rememberedEmail');
+          localStorage.removeItem('rememberedPassword');
+        }
+
+        const currentUser = JSON.parse(localStorage.getItem('userInfo') || '{}');
+        if (currentUser?.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/');
+        }
       } else {
-        localStorage.removeItem('rememberedEmail');
-        localStorage.removeItem('rememberedPassword');
+        setErrorMsg(result?.message || 'Invalid email or password.');
       }
-    } else {
-      setErrorMsg(result.message);
+    } catch (err) {
+      setSubmitting(false);
+      setErrorMsg(err.message || 'Login failed. Please check network connection.');
     }
   };
 
