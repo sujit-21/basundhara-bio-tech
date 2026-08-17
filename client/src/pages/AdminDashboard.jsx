@@ -531,7 +531,7 @@ const AdminDashboard = () => {
           {/* Mobile Sidebar Toggle Header */}
           <div className="d-md-none col-12 p-3 border-bottom border-secondary border-opacity-10 d-flex justify-content-between align-items-center bg-dark text-white">
             <div className="science-font fw-bold text-success d-flex align-items-center">
-              <i className="bi bi-shield-lock-fill me-2 fs-5"></i> Admin Console
+              <i className="bi bi-shield-lock-fill me-2 fs-5"></i> Admin Panel
             </div>
             <button 
               className="btn btn-sm btn-outline-success border-0 text-white" 
@@ -545,7 +545,7 @@ const AdminDashboard = () => {
           {/* Sidebar Nav */}
           <div className={`col-md-3 col-lg-2 px-0 admin-sidebar py-4 px-3 shadow-sm ${mobileSidebarOpen ? 'd-block' : 'd-none d-md-flex flex-column'}`}>
             <div className="science-font fw-bold text-success mb-4 px-2 d-none d-md-flex align-items-center">
-              <i className="bi bi-shield-lock-fill me-2 fs-5"></i> Trade Console
+              <i className="bi bi-shield-lock-fill me-2 fs-5"></i> Admin Panel
             </div>
             
             <nav className="nav flex-column">
