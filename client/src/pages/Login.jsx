@@ -161,10 +161,7 @@ const Login = () => {
                 <Link to="/register" className="text-success fw-bold text-decoration-none">Create an Account</Link>
               </div>
 
-              {/* Seed note details */}
-              <div className="mt-4 p-3 bg-light rounded text-secondary" style={{ fontSize: '11px' }}>
-                <strong>Demo User:</strong> <span className="font-monospace">user@basundharabiotech.com</span> / <span className="font-monospace">user12345</span>
-              </div>
+
             </div>
           </div>
         </div>

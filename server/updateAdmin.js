@@ -12,7 +12,8 @@ if (process.env.NODE_ENV !== 'production') {
   }
 }
 
-dotenv.config();
+const path = require('path');
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 mongoose.connect(process.env.MONGODB_URI)
   .then(async () => {
