@@ -19,38 +19,25 @@ mongoose.connect(process.env.MONGODB_URI)
   .then(async () => {
     console.log('Connected to DB');
     
-    // Ensure admin@basundharabiotech.com exists
-    let admin1 = await User.findOne({ email: 'admin@basundharabiotech.com' });
-    if (admin1) {
-      admin1.password = 'admin12345';
-      admin1.role = 'admin';
-      await admin1.save();
-    } else {
-      admin1 = new User({
-        name: 'Admin',
-        email: 'admin@basundharabiotech.com',
-        password: 'admin12345',
-        role: 'admin'
-      });
-      await admin1.save();
-    }
+    // Remove old admin@basundharabiotech.com if present
+    await User.deleteOne({ email: 'admin@basundharabiotech.com' });
 
-    // Ensure basundharabiotech@gmail.com exists
-    let admin2 = await User.findOne({ email: 'basundharabiotech@gmail.com' });
-    if (admin2) {
-      admin2.password = 'basundharabiotech@2026';
-      admin2.role = 'admin';
-      await admin2.save();
+    // Ensure basundharabiotech@gmail.com is the single official Admin
+    let admin = await User.findOne({ email: 'basundharabiotech@gmail.com' });
+    if (admin) {
+      admin.password = 'basundharabiotech@2026';
+      admin.role = 'admin';
+      await admin.save();
     } else {
-      admin2 = new User({
+      admin = new User({
         name: 'Basundhara Admin',
         email: 'basundharabiotech@gmail.com',
         password: 'basundharabiotech@2026',
         role: 'admin'
       });
-      await admin2.save();
+      await admin.save();
     }
-    console.log('Admin users synchronized successfully');
+    console.log('Sole Admin user (basundharabiotech@gmail.com) synchronized successfully');
     process.exit(0);
   })
   .catch((err) => {

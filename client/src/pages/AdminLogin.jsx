@@ -107,7 +107,7 @@ const AdminLogin = () => {
                       type="email"
                       className="form-control bg-dark text-white border-secondary"
                       id="adminEmail"
-                      placeholder="admin@basundharabiotech.com"
+                      placeholder="basundharabiotech@gmail.com"
                       value={email}
                       onChange={(e) => { setEmail(e.target.value); setErrorMsg(''); }}
                       required

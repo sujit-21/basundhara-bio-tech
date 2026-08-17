@@ -101,8 +101,8 @@ Follow these steps to run the application locally on your Windows machine.
 Use these pre-seeded accounts to explore the application:
 
 - **Administrator Clearance (Dashboard Access)**
-  - Email: `admin@basundharabiotech.com`
-  - Password: `admin12345`
+  - Email: `basundharabiotech@gmail.com`
+  - Password: `basundharabiotech@2026`
 
 - **Standard User Clearance**
   - Email: `user@basundharabiotech.com`
