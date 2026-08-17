@@ -163,9 +163,7 @@ const Login = () => {
 
               {/* Seed note details */}
               <div className="mt-4 p-3 bg-light rounded text-secondary" style={{ fontSize: '11px' }}>
-                <strong>Demo Credentials:</strong><br />
-                • Admin: <span className="font-monospace">admin@basundharabiotech.com</span> / <span className="font-monospace">admin12345</span><br />
-                • User: <span className="font-monospace">user@basundharabiotech.com</span> / <span className="font-monospace">user12345</span>
+                <strong>Demo User:</strong> <span className="font-monospace">user@basundharabiotech.com</span> / <span className="font-monospace">user12345</span>
               </div>
             </div>
           </div>

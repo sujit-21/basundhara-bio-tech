@@ -86,9 +86,8 @@ const Contact = () => {
       <div className="container">
         {/* Header */}
         <div className="text-center mb-5">
-          <span className="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill science-font mb-2">Connect With Us</span>
           <h1 className="science-font fw-bold text-gradient-bio">Contact Us</h1>
-          <p className="text-muted" style={{ maxWidth: '700px', margin: '0 auto' }}>
+          <p className="text-muted fw-medium" style={{ maxWidth: '700px', margin: '0 auto' }}>
             Have a question or inquiry? We'd love to hear from you. Send us a message and our team will get back to you soon.
           </p>
         </div>
@@ -100,35 +99,35 @@ const Contact = () => {
             <div className="d-flex flex-column gap-5 mb-5">
               {offices.map((office) => (
                 <div key={office._id} className="office-location-block pb-4 border-bottom border-secondary border-opacity-10">
-                  <h4 className="science-font fw-bold text-success fs-5 mb-3">{office.title}</h4>
+                  <h4 className="science-font fw-bold text-gradient-bio fs-5 mb-3">{office.title}</h4>
                   <div className="d-flex flex-column gap-3">
                     <div className="d-flex gap-3">
-                      <div className="bg-success bg-opacity-10 text-success rounded p-3 d-flex align-items-center justify-content-center" style={{ width: '48px', height: '48px', flexShrink: 0 }}>
+                      <div className="btn-science-secondary text-white rounded p-3 d-flex align-items-center justify-content-center shadow-sm" style={{ width: '48px', height: '48px', flexShrink: 0 }}>
                         <i className="bi bi-geo-alt-fill fs-5"></i>
                       </div>
                       <div>
-                        <h6 className="fw-bold text-dark mb-1 small">Corporate Address</h6>
-                        <p className="text-muted small mb-0">{office.address}</p>
+                        <h6 className="fw-bold text-dark mb-1 small">Address</h6>
+                        <p className="text-secondary small mb-0 fw-medium">{office.address}</p>
                       </div>
                     </div>
 
                     <div className="d-flex gap-3">
-                      <div className="bg-primary bg-opacity-10 text-primary rounded p-3 d-flex align-items-center justify-content-center" style={{ width: '48px', height: '48px', flexShrink: 0 }}>
+                      <div className="btn-science-primary text-white rounded p-3 d-flex align-items-center justify-content-center shadow-sm" style={{ width: '48px', height: '48px', flexShrink: 0 }}>
                         <i className="bi bi-telephone-fill fs-5"></i>
                       </div>
                       <div>
-                        <h6 className="fw-bold text-dark mb-1 small">Call Office</h6>
-                        <p className="text-muted small mb-0">{office.phone}</p>
+                        <h6 className="fw-bold text-dark mb-1 small">Phone</h6>
+                        <p className="text-secondary small mb-0 fw-medium">{office.phone}</p>
                       </div>
                     </div>
 
                     <div className="d-flex gap-3">
-                      <div className="bg-success bg-opacity-10 text-success rounded p-3 d-flex align-items-center justify-content-center" style={{ width: '48px', height: '48px', flexShrink: 0 }}>
+                      <div className="btn-science-secondary text-white rounded p-3 d-flex align-items-center justify-content-center shadow-sm" style={{ width: '48px', height: '48px', flexShrink: 0 }}>
                         <i className="bi bi-envelope-at-fill fs-5"></i>
                       </div>
                       <div>
-                        <h6 className="fw-bold text-dark mb-1 small">Email Correspondence</h6>
-                        <p className="text-muted small mb-0">{office.email}</p>
+                        <h6 className="fw-bold text-dark mb-1 small">Email</h6>
+                        <p className="text-secondary small mb-0 fw-medium">{office.email}</p>
                       </div>
                     </div>
                   </div>

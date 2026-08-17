@@ -20,6 +20,7 @@ import Contact from './pages/Contact';
 import Cart from './pages/Cart';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import NotFound from './pages/NotFound';
 
@@ -48,6 +49,10 @@ function App() {
               {/* Auth Routes */}
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              
+              {/* Secret Admin Login Routes */}
+              <Route path="/secret-admin-login" element={<AdminLogin />} />
+              <Route path="/admin-portal-login" element={<AdminLogin />} />
               
               {/* Protected Admin Routes */}
               <Route

@@ -18,24 +18,38 @@ mongoose.connect(process.env.MONGODB_URI)
   .then(async () => {
     console.log('Connected to DB');
     
-    // Find existing admin or create a new one
-    let adminUser = await User.findOne({ role: 'admin' });
-    
-    if (adminUser) {
-        adminUser.email = 'basundharabiotech@gmail.com';
-        adminUser.password = 'basundharabiotech@2026';
-        await adminUser.save();
-        console.log('Admin user updated successfully');
+    // Ensure admin@basundharabiotech.com exists
+    let admin1 = await User.findOne({ email: 'admin@basundharabiotech.com' });
+    if (admin1) {
+      admin1.password = 'admin12345';
+      admin1.role = 'admin';
+      await admin1.save();
     } else {
-        adminUser = new User({
-            name: 'Admin',
-            email: 'basundharabiotech@gmail.com',
-            password: 'basundharabiotech@2026',
-            role: 'admin'
-        });
-        await adminUser.save();
-        console.log('Admin user created successfully');
+      admin1 = new User({
+        name: 'Admin',
+        email: 'admin@basundharabiotech.com',
+        password: 'admin12345',
+        role: 'admin'
+      });
+      await admin1.save();
     }
+
+    // Ensure basundharabiotech@gmail.com exists
+    let admin2 = await User.findOne({ email: 'basundharabiotech@gmail.com' });
+    if (admin2) {
+      admin2.password = 'basundharabiotech@2026';
+      admin2.role = 'admin';
+      await admin2.save();
+    } else {
+      admin2 = new User({
+        name: 'Basundhara Admin',
+        email: 'basundharabiotech@gmail.com',
+        password: 'basundharabiotech@2026',
+        role: 'admin'
+      });
+      await admin2.save();
+    }
+    console.log('Admin users synchronized successfully');
     process.exit(0);
   })
   .catch((err) => {

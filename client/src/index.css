@@ -1,22 +1,21 @@
 :root {
-  --text: #6e7f73;
-  --text-h: #395886;
-  --bg: #f2f2f0;
-  --border: #c4cfc7;
-  --code-bg: #D5DEEF;
-  --accent: #628ECB;
-  --accent-bg: rgba(98, 142, 203, 0.1);
-  --accent-border: rgba(98, 142, 203, 0.5);
-  --social-bg: rgba(196, 207, 199, 0.5);
-  --shadow:
-    rgba(57, 88, 134, 0.1) 0 10px 15px -3px, rgba(57, 88, 134, 0.05) 0 4px 6px -2px;
+  --text: #334155;
+  --text-h: #0F172A;
+  --bg: #F8FAFC;
+  --border: #CBD5E1;
+  --code-bg: #E2E8F0;
+  --accent: #2563EB;
+  --accent-bg: rgba(37, 99, 235, 0.1);
+  --accent-border: rgba(37, 99, 235, 0.5);
+  --social-bg: rgba(203, 213, 225, 0.5);
+  --shadow: rgba(15, 23, 42, 0.08) 0 10px 15px -3px, rgba(15, 23, 42, 0.04) 0 4px 6px -2px;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --heading: 'Orbitron', 'Inter', system-ui, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
+  font: 14.5px/140% var(--sans);
+  letter-spacing: 0.1px;
   color-scheme: light dark;
   color: var(--text);
   background: var(--bg);
@@ -24,47 +23,25 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #f2f2f0;
-    --text-h: #ffffff;
-    --bg: #000000;
-    --border: #395886;
-    --code-bg: #111111;
-    --accent: #628ECB;
-    --accent-bg: rgba(98, 142, 203, 0.15);
-    --accent-border: rgba(98, 142, 203, 0.5);
-    --social-bg: rgba(255, 255, 255, 0.1);
-    --shadow:
-      rgba(255, 255, 255, 0.05) 0 10px 15px -3px, rgba(255, 255, 255, 0.02) 0 4px 6px -2px;
-  }
-
-  .bg-white, .bg-light, .card, .modal-content, .offcanvas, .dropdown-menu {
-    background-color: #111111 !important;
-    border-color: var(--border) !important;
-    color: var(--text) !important;
-  }
-
-  .text-muted {
-    color: #a0a0a0 !important;
-  }
-
-  .border, .border-bottom, .border-top, .border-end, .border-start {
-    border-color: var(--border) !important;
-  }
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+.dark-mode {
+  --text: #F8FAFC;
+  --text-h: #FFFFFF;
+  --bg: #0F172A;
+  --border: #334155;
+  --code-bg: #1E293B;
+  --accent: #60A5FA;
+  --accent-bg: rgba(96, 165, 250, 0.15);
+  --accent-border: rgba(96, 165, 250, 0.5);
+  --social-bg: rgba(255, 255, 255, 0.1);
+  --shadow: rgba(0, 0, 0, 0.5) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
 }
 
 body {
   margin: 0;
+  font-size: 14.5px;
+  line-height: 1.45;
 }
 
 .text-dark {
@@ -72,42 +49,52 @@ body {
 }
 
 #root {
-  width: 1126px;
+  width: 100%;
   max-width: 100%;
   margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
 }
 
-h1,
-h2 {
+h1, h2, h3, h4, h5, h6 {
   font-family: var(--heading);
-  font-weight: 500;
+  font-weight: 700;
   color: var(--text-h);
 }
 
 h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
+  font-size: 32px;
+  letter-spacing: -0.8px;
+  margin: 14px 0;
 }
+
 h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
+  font-size: 22px;
+  line-height: 125%;
+  letter-spacing: -0.2px;
+  margin: 0 0 10px;
 }
+
+h3 {
+  font-size: 18px;
+  margin: 0 0 8px;
+}
+
+h4 {
+  font-size: 16px;
+  margin: 0 0 6px;
+}
+
+h5 {
+  font-size: 14px;
+}
+
+h6 {
+  font-size: 13px;
+}
+
 p {
   margin: 0;
 }
@@ -121,12 +108,8 @@ code,
 }
 
 code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
+  font-size: 13px;
+  line-height: 130%;
+  padding: 3px 6px;
   background: var(--code-bg);
-}
-
-.bg-gradient-science {
-  background: linear-gradient(135deg, #0b1121 0%, #172a46 100%);
 }

@@ -71,8 +71,8 @@ const DNAAnimation = () => {
           
           if (dist < 150) {
             // Draw connection line
-            const alpha = (1 - dist / 150) * 0.15;
-            ctx.strokeStyle = `rgba(76, 175, 80, ${alpha})`;
+            const alpha = (1 - dist / 150) * 0.2;
+            ctx.strokeStyle = `rgba(80, 129, 190, ${alpha})`;
             ctx.beginPath();
             ctx.moveTo(cellA.x, cellA.y);
             ctx.lineTo(cellB.x, cellB.y);
@@ -81,38 +81,38 @@ const DNAAnimation = () => {
         }
       }
 
-      // Draw Plant Cells (green circles with walls and chloroplast nodes)
+      // Draw Plant Cells (sage green circles with walls and blue nodes)
       for (let i = 0; i < cellsCount; i++) {
         const cell = cells[i];
         
         const pulse = 1 + Math.sin(frame * cell.pulseSpeed + cell.pulseOffset) * 0.08;
         const currentRadius = cell.radius * pulse;
 
-        // Draw Cell Wall (hexagonal shape or clean circle with double layers)
-        ctx.strokeStyle = 'rgba(46, 125, 50, 0.25)';
+        // Draw Cell Wall (Sage Green outer layer)
+        ctx.strokeStyle = 'rgba(110, 127, 115, 0.35)';
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.arc(cell.x, cell.y, currentRadius, 0, Math.PI * 2);
         ctx.stroke();
 
-        // Inner membrane
-        ctx.strokeStyle = 'rgba(76, 175, 80, 0.4)';
+        // Inner membrane (Soft Blue)
+        ctx.strokeStyle = 'rgba(126, 186, 218, 0.5)';
         ctx.lineWidth = 1.0;
         ctx.beginPath();
         ctx.arc(cell.x, cell.y, currentRadius - 3, 0, Math.PI * 2);
         ctx.stroke();
 
         // Cell cytoplasm fill
-        ctx.fillStyle = 'rgba(76, 175, 80, 0.03)';
+        ctx.fillStyle = 'rgba(224, 242, 252, 0.08)';
         ctx.beginPath();
         ctx.arc(cell.x, cell.y, currentRadius - 3, 0, Math.PI * 2);
         ctx.fill();
 
-        // Draw Nucleus core (earthy gold/amber glow)
+        // Draw Nucleus core (Vibrant Royal Tech Blue glow)
         ctx.beginPath();
         ctx.arc(cell.x, cell.y, 4, 0, Math.PI * 2);
-        ctx.fillStyle = '#d97706';
-        ctx.shadowColor = '#d97706';
+        ctx.fillStyle = '#5081BE';
+        ctx.shadowColor = '#7EBADA';
         ctx.shadowBlur = 8;
         ctx.fill();
         ctx.shadowBlur = 0; // reset
@@ -125,7 +125,7 @@ const DNAAnimation = () => {
           
           ctx.beginPath();
           ctx.arc(cx, cy, 2, 0, Math.PI * 2);
-          ctx.fillStyle = '#4caf50';
+          ctx.fillStyle = '#9FB8AA';
           ctx.fill();
         });
       }

@@ -168,7 +168,6 @@ const Cart = () => {
         
         {/* Header */}
         <div className="text-center mb-5">
-          <span className="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill science-font mb-2">Checkout Desk</span>
           <h1 className="science-font fw-bold text-gradient-bio">Your Selection & Billing</h1>
           <p className="text-muted" style={{ maxWidth: '700px', margin: '0 auto' }}>
             Manage your selected biotech solutions, fill out customer billing parameters, and confirm your order clearance.

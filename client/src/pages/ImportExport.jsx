@@ -28,7 +28,6 @@ const ImportExport = () => {
       <div className="container">
         {/* Header */}
         <div className="text-center mb-5">
-          <span className="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill science-font mb-2">Global Logistics</span>
           <h1 className="science-font fw-bold text-gradient-bio">Import & Export Services</h1>
           <p className="text-muted" style={{ maxWidth: '750px', margin: '0 auto' }}>
             We manage high-compliance trade corridors supplying premium organic bio-materials and dehydrated products to global hubs.
@@ -104,9 +103,9 @@ const ImportExport = () => {
         )}
 
         {/* Global form call */}
-        <div className="glass-card p-5 text-center border-0" style={{ background: '#f4f6f4', borderRadius: '24px' }}>
+        <div className="glass-card p-5 text-center shadow-sm" style={{ borderRadius: '24px' }}>
           <h3 className="science-font fw-bold text-dark mb-2">Initiate Trade Negotiation</h3>
-          <p className="text-muted small mb-4" style={{ maxWidth: '650px', margin: '0 auto' }}>
+          <p className="text-secondary small mb-4" style={{ maxWidth: '650px', margin: '0 auto' }}>
             Our compliance desk resolves certifications and supply schedules for commercial buyers. Reach out to coordinate shipping logistics.
           </p>
           <a href="/contact?subject=Trade Corridor inquiry" className="btn btn-science-primary">

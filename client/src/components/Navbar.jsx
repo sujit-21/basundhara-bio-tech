@@ -34,8 +34,9 @@ const Navbar = () => {
   return (
     <nav className="navbar navbar-expand-xl sticky-top glass-nav navbar-light py-2">
       <div className="container-fluid px-3 px-xl-4">
-        <Link className="navbar-brand d-flex align-items-center" to="/">
-          <span className="science-font fw-bold fs-4 text-gradient-bio">BASUNDHARA</span><span className="science-font fw-light fs-4 text-secondary ms-1">BIO-TECH</span>
+        <Link className="navbar-brand d-flex flex-column text-start py-0" to="/">
+          <span className="brand-logo-title">BASUNDHARA</span>
+          <span className="brand-logo-subtitle">BIO-TECH</span>
         </Link>
 
         <button
@@ -124,6 +125,13 @@ const Navbar = () => {
                   <li>
                     <span className="dropdown-item-text text-muted small">Role: {(user?.role || 'user').toUpperCase()}</span>
                   </li>
+                  {isAdmin && (
+                    <li>
+                      <Link className="dropdown-item text-primary fw-bold d-flex align-items-center" to="/admin">
+                        <i className="bi bi-shield-lock-fill me-2"></i>Admin Dashboard
+                      </Link>
+                    </li>
+                  )}
                   <li>
                     <hr className="dropdown-divider" />
                   </li>

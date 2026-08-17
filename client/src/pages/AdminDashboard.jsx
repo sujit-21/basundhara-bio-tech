@@ -32,6 +32,7 @@ const AdminDashboard = () => {
   const [showForm, setShowForm] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // Alert State
   const [alertInfo, setAlertInfo] = useState({ show: false, message: '', type: 'success' });
@@ -527,14 +528,28 @@ const AdminDashboard = () => {
       <div className="container-fluid">
         <div className="row">
           
+          {/* Mobile Sidebar Toggle Header */}
+          <div className="d-md-none col-12 p-3 border-bottom border-secondary border-opacity-10 d-flex justify-content-between align-items-center bg-dark text-white">
+            <div className="science-font fw-bold text-success d-flex align-items-center">
+              <i className="bi bi-shield-lock-fill me-2 fs-5"></i> Trade Console
+            </div>
+            <button 
+              className="btn btn-sm btn-outline-success border-0 text-white" 
+              onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+              aria-label="Toggle Admin Sidebar"
+            >
+              <i className={`bi ${mobileSidebarOpen ? 'bi-x-lg text-danger' : 'bi-list text-success'} fs-4`}></i>
+            </button>
+          </div>
+
           {/* Sidebar Nav */}
-          <div className="col-md-3 col-lg-2 px-0 admin-sidebar d-flex flex-column py-4 px-3 shadow-sm">
-            <div className="science-font fw-bold text-success mb-4 px-2 d-flex align-items-center">
+          <div className={`col-md-3 col-lg-2 px-0 admin-sidebar py-4 px-3 shadow-sm ${mobileSidebarOpen ? 'd-block' : 'd-none d-md-flex flex-column'}`}>
+            <div className="science-font fw-bold text-success mb-4 px-2 d-none d-md-flex align-items-center">
               <i className="bi bi-shield-lock-fill me-2 fs-5"></i> Trade Console
             </div>
             
             <nav className="nav flex-column">
-              <button onClick={() => { setActiveTab('overview'); setShowForm(false); }} className={`nav-link border-0 text-start bg-transparent ${activeTab === 'overview' ? 'active' : ''}`}>
+              <button onClick={() => { setActiveTab('overview'); setShowForm(false); setMobileSidebarOpen(false); }} className={`nav-link border-0 text-start bg-transparent ${activeTab === 'overview' ? 'active' : ''}`}>
                 <i className="bi bi-pie-chart-fill me-2"></i> Overview
               </button>
 
@@ -610,7 +625,7 @@ const AdminDashboard = () => {
             
             <div className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
               <div>
-                <h1 className="science-font fw-bold fs-3 text-gradient-bio mb-1">Basundhara Enterprise Console</h1>
+                <h1 className="science-font fw-bold fs-3 text-gradient-bio mb-1">Basundhara Bio-Tech</h1>
                 <p className="text-muted small mb-0">Logged in: {user?.name} ({user?.email})</p>
               </div>
               <button onClick={loadData} className="btn btn-sm btn-outline-secondary">
@@ -634,118 +649,98 @@ const AdminDashboard = () => {
                 {/* --- TAB: OVERVIEW --- */}
                 {activeTab === 'overview' && stats && (
                   <div>
-                    <div className="row g-4 mb-5">
-                      <div className="col-md-3 col-6">
-                        <div className="card glass-card p-4 border border-secondary border-opacity-10 text-center">
-                          <i className="bi bi-grid fs-1 text-success mb-2"></i>
-                          <h3 className="fw-bold science-font">{stats.counts.categories}</h3>
-                          <span className="text-muted small">Categories</span>
-                        </div>
+                    <div className="d-flex flex-wrap align-items-center mb-4" style={{ gap: '14px' }}>
+                      <div className="card glass-card text-center shadow-sm d-flex flex-column justify-content-center align-items-center p-1 border border-secondary border-opacity-10" style={{ width: '92px', height: '88px', borderRadius: '14px', flexShrink: 0 }}>
+                        <i className="bi bi-grid text-success mb-1" style={{ fontSize: '1.1rem' }}></i>
+                        <h6 className="fw-bold science-font mb-0 text-dark" style={{ fontSize: '0.9rem', lineHeight: '1.1' }}>{stats.counts.categories}</h6>
+                        <span className="text-muted fw-semibold" style={{ fontSize: '9px', whiteSpace: 'nowrap', marginTop: '2px' }}>Categories</span>
                       </div>
-                      <div className="col-md-3 col-6">
-                        <div className="card glass-card p-4 border border-secondary border-opacity-10 text-center">
-                          <i className="bi bi-basket3 fs-1 text-primary mb-2"></i>
-                          <h3 className="fw-bold science-font">{stats.counts.products}</h3>
-                          <span className="text-muted small">Products Catalog</span>
-                        </div>
+                      <div className="card glass-card text-center shadow-sm d-flex flex-column justify-content-center align-items-center p-1 border border-secondary border-opacity-10" style={{ width: '92px', height: '88px', borderRadius: '14px', flexShrink: 0 }}>
+                        <i className="bi bi-basket3 text-primary mb-1" style={{ fontSize: '1.1rem' }}></i>
+                        <h6 className="fw-bold science-font mb-0 text-dark" style={{ fontSize: '0.9rem', lineHeight: '1.1' }}>{stats.counts.products}</h6>
+                        <span className="text-muted fw-semibold" style={{ fontSize: '9px', whiteSpace: 'nowrap', marginTop: '2px' }}>Products Catalog</span>
                       </div>
-                      <div className="col-md-3 col-6">
-                        <div className="card glass-card p-4 border border-secondary border-opacity-10 text-center">
-                          <i className="bi bi-globe2 fs-1 text-success mb-2"></i>
-                          <h3 className="fw-bold science-font">{stats.counts.importExport}</h3>
-                          <span className="text-muted small">Logistics Routes</span>
-                        </div>
+                      <div className="card glass-card text-center shadow-sm d-flex flex-column justify-content-center align-items-center p-1 border border-secondary border-opacity-10" style={{ width: '92px', height: '88px', borderRadius: '14px', flexShrink: 0 }}>
+                        <i className="bi bi-globe2 text-success mb-1" style={{ fontSize: '1.1rem' }}></i>
+                        <h6 className="fw-bold science-font mb-0 text-dark" style={{ fontSize: '0.9rem', lineHeight: '1.1' }}>{stats.counts.importExport}</h6>
+                        <span className="text-muted fw-semibold" style={{ fontSize: '9px', whiteSpace: 'nowrap', marginTop: '2px' }}>Logistics Routes</span>
                       </div>
-                      <div className="col-md-3 col-6">
-                        <div className="card glass-card p-4 border border-secondary border-opacity-10 text-center">
-                          <i className="bi bi-receipt-cutoff fs-1 text-primary mb-2"></i>
-                          <h3 className="fw-bold science-font">{stats.orders?.total || 0}</h3>
-                          <span className="text-muted small">Total Orders</span>
-                        </div>
+                      <div className="card glass-card text-center shadow-sm d-flex flex-column justify-content-center align-items-center p-1 border border-secondary border-opacity-10" style={{ width: '92px', height: '88px', borderRadius: '14px', flexShrink: 0 }}>
+                        <i className="bi bi-receipt-cutoff text-primary mb-1" style={{ fontSize: '1.1rem' }}></i>
+                        <h6 className="fw-bold science-font mb-0 text-dark" style={{ fontSize: '0.9rem', lineHeight: '1.1' }}>{stats.orders?.total || 0}</h6>
+                        <span className="text-muted fw-semibold" style={{ fontSize: '9px', whiteSpace: 'nowrap', marginTop: '2px' }}>Total Orders</span>
                       </div>
-                      <div className="col-md-3 col-6">
-                        <div className="card glass-card p-4 border border-secondary border-opacity-10 text-center">
-                          <i className="bi bi-currency-rupee fs-1 text-success mb-2"></i>
-                          <h3 className="fw-bold science-font">Rs. {(stats.orders?.revenue || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</h3>
-                          <span className="text-muted small">Revenue</span>
-                        </div>
+                      <div className="card glass-card text-center shadow-sm d-flex flex-column justify-content-center align-items-center p-1 border border-secondary border-opacity-10" style={{ width: '92px', height: '88px', borderRadius: '14px', flexShrink: 0 }}>
+                        <i className="bi bi-currency-rupee text-success mb-1" style={{ fontSize: '1.1rem' }}></i>
+                        <h6 className="fw-bold science-font mb-0 text-dark" style={{ fontSize: '0.85rem', lineHeight: '1.1' }}>Rs. {(stats.orders?.revenue || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</h6>
+                        <span className="text-muted fw-semibold" style={{ fontSize: '9px', whiteSpace: 'nowrap', marginTop: '2px' }}>Revenue</span>
                       </div>
-                      <div className="col-md-3 col-6">
-                        <div className="card glass-card p-4 border border-secondary border-opacity-10 text-center">
-                          <i className="bi bi-chat-dots fs-1 text-primary mb-2"></i>
-                          <h3 className="fw-bold science-font">{stats.counts.contacts}</h3>
-                          <span className="text-muted small">Total Inquiries</span>
-                        </div>
+                      <div className="card glass-card text-center shadow-sm d-flex flex-column justify-content-center align-items-center p-1 border border-secondary border-opacity-10" style={{ width: '92px', height: '88px', borderRadius: '14px', flexShrink: 0 }}>
+                        <i className="bi bi-chat-dots text-primary mb-1" style={{ fontSize: '1.1rem' }}></i>
+                        <h6 className="fw-bold science-font mb-0 text-dark" style={{ fontSize: '0.9rem', lineHeight: '1.1' }}>{stats.counts.contacts}</h6>
+                        <span className="text-muted fw-semibold" style={{ fontSize: '9px', whiteSpace: 'nowrap', marginTop: '2px' }}>Total Inquiries</span>
                       </div>
-                      <div className="col-md-3 col-6">
-                        <div className="card glass-card p-4 border border-secondary border-opacity-10 text-center">
-                          <i className="bi bi-geo-alt fs-1 text-success mb-2"></i>
-                          <h3 className="fw-bold science-font">{offices.length}</h3>
-                          <span className="text-muted small">Active Offices</span>
-                        </div>
+                      <div className="card glass-card text-center shadow-sm d-flex flex-column justify-content-center align-items-center p-1 border border-secondary border-opacity-10" style={{ width: '92px', height: '88px', borderRadius: '14px', flexShrink: 0 }}>
+                        <i className="bi bi-geo-alt text-success mb-1" style={{ fontSize: '1.1rem' }}></i>
+                        <h6 className="fw-bold science-font mb-0 text-dark" style={{ fontSize: '0.9rem', lineHeight: '1.1' }}>{offices.length}</h6>
+                        <span className="text-muted fw-semibold" style={{ fontSize: '9px', whiteSpace: 'nowrap', marginTop: '2px' }}>Active Offices</span>
                       </div>
                     </div>
 
-                    <div className="row g-4">
+                    <div className="d-flex flex-wrap align-items-stretch" style={{ gap: '14px' }}>
                       {/* Inquiry summary */}
-                      <div className="col-lg-4">
-                        <div className="card glass-card p-4 border border-secondary border-opacity-10 h-100">
-                          <h5 className="science-font fw-bold mb-4 text-dark"><i className="bi bi-inbox-fill text-success me-2"></i>Inquiries Box</h5>
-                          <div className="d-flex flex-column gap-3">
-                            <div className="d-flex justify-content-between align-items-center p-2.5 bg-light rounded">
-                              <span className="fw-semibold text-danger small"><i className="bi bi-envelope-fill me-2"></i>Pending</span>
-                              <span className="badge bg-danger fs-6">{stats.messages.unread}</span>
-                            </div>
-                            <div className="d-flex justify-content-between align-items-center p-2.5 bg-light rounded">
-                              <span className="fw-semibold text-warning"><i className="bi bi-envelope-open-fill me-2"></i>Read</span>
-                              <span className="badge bg-warning text-dark fs-6">{stats.messages.read}</span>
-                            </div>
-                            <div className="d-flex justify-content-between align-items-center p-2.5 bg-light rounded">
-                              <span className="fw-semibold text-success"><i className="bi bi-check-circle-fill me-2"></i>Replied</span>
-                              <span className="badge bg-success fs-6">{stats.messages.replied}</span>
-                            </div>
+                      <div className="card glass-card p-2.5 border border-secondary border-opacity-10 shadow-sm" style={{ width: '230px', borderRadius: '14px', flexShrink: 0 }}>
+                        <h6 className="science-font fw-bold mb-2 text-dark" style={{ fontSize: '0.85rem' }}><i className="bi bi-inbox-fill text-success me-2"></i>Inquiries Box</h6>
+                        <div className="d-flex flex-column gap-1.5">
+                          <div className="d-flex justify-content-between align-items-center py-1 px-2 bg-light rounded">
+                            <span className="fw-semibold text-danger" style={{ fontSize: '11px' }}><i className="bi bi-envelope-fill me-2"></i>Pending</span>
+                            <span className="badge bg-danger py-0.5 px-1.5" style={{ fontSize: '10px' }}>{stats.messages.unread}</span>
+                          </div>
+                          <div className="d-flex justify-content-between align-items-center py-1 px-2 bg-light rounded">
+                            <span className="fw-semibold text-warning" style={{ fontSize: '11px' }}><i className="bi bi-envelope-open-fill me-2"></i>Read</span>
+                            <span className="badge bg-warning text-dark py-0.5 px-1.5" style={{ fontSize: '10px' }}>{stats.messages.read}</span>
+                          </div>
+                          <div className="d-flex justify-content-between align-items-center py-1 px-2 bg-light rounded">
+                            <span className="fw-semibold text-success" style={{ fontSize: '11px' }}><i className="bi bi-check-circle-fill me-2"></i>Replied</span>
+                            <span className="badge bg-success py-0.5 px-1.5" style={{ fontSize: '10px' }}>{stats.messages.replied}</span>
                           </div>
                         </div>
                       </div>
 
                       {/* Order summary */}
-                      <div className="col-lg-4">
-                        <div className="card glass-card p-4 border border-secondary border-opacity-10 h-100">
-                          <h5 className="science-font fw-bold mb-4 text-dark"><i className="bi bi-truck text-primary me-2"></i>Orders Status</h5>
-                          <div className="d-flex flex-column gap-2">
-                            <div className="d-flex justify-content-between align-items-center p-2 bg-light rounded">
-                              <span className="fw-semibold text-danger small"><i className="bi bi-clock-history me-2"></i>Pending</span>
-                              <span className="badge bg-danger">{stats.orders?.pending || 0}</span>
-                            </div>
-                            <div className="d-flex justify-content-between align-items-center p-2 bg-light rounded">
-                              <span className="fw-semibold text-warning small"><i className="bi bi-gear-fill me-2"></i>Processing</span>
-                              <span className="badge bg-warning text-dark">{stats.orders?.processing || 0}</span>
-                            </div>
-                            <div className="d-flex justify-content-between align-items-center p-2 bg-light rounded">
-                              <span className="fw-semibold text-primary small"><i className="bi bi-truck me-2"></i>Shipped</span>
-                              <span className="badge bg-primary">{stats.orders?.shipped || 0}</span>
-                            </div>
-                            <div className="d-flex justify-content-between align-items-center p-2 bg-light rounded">
-                              <span className="fw-semibold text-success small"><i className="bi bi-check-circle-fill me-2"></i>Completed</span>
-                              <span className="badge bg-success">{stats.orders?.completed || 0}</span>
-                            </div>
+                      <div className="card glass-card p-2.5 border border-secondary border-opacity-10 shadow-sm" style={{ width: '230px', borderRadius: '14px', flexShrink: 0 }}>
+                        <h6 className="science-font fw-bold mb-2 text-dark" style={{ fontSize: '0.85rem' }}><i className="bi bi-truck text-primary me-2"></i>Orders Status</h6>
+                        <div className="d-flex flex-column gap-1">
+                          <div className="d-flex justify-content-between align-items-center py-1 px-2 bg-light rounded">
+                            <span className="fw-semibold text-danger" style={{ fontSize: '11px' }}><i className="bi bi-clock-history me-2"></i>Pending</span>
+                            <span className="badge bg-danger py-0.5 px-1.5" style={{ fontSize: '10px' }}>{stats.orders?.pending || 0}</span>
+                          </div>
+                          <div className="d-flex justify-content-between align-items-center py-1 px-2 bg-light rounded">
+                            <span className="fw-semibold text-warning" style={{ fontSize: '11px' }}><i className="bi bi-gear-fill me-2"></i>Processing</span>
+                            <span className="badge bg-warning text-dark py-0.5 px-1.5" style={{ fontSize: '10px' }}>{stats.orders?.processing || 0}</span>
+                          </div>
+                          <div className="d-flex justify-content-between align-items-center py-1 px-2 bg-light rounded">
+                            <span className="fw-semibold text-primary" style={{ fontSize: '11px' }}><i className="bi bi-truck me-2"></i>Shipped</span>
+                            <span className="badge bg-primary py-0.5 px-1.5" style={{ fontSize: '10px' }}>{stats.orders?.shipped || 0}</span>
+                          </div>
+                          <div className="d-flex justify-content-between align-items-center py-1 px-2 bg-light rounded">
+                            <span className="fw-semibold text-success" style={{ fontSize: '11px' }}><i className="bi bi-check-circle-fill me-2"></i>Completed</span>
+                            <span className="badge bg-success py-0.5 px-1.5" style={{ fontSize: '10px' }}>{stats.orders?.completed || 0}</span>
                           </div>
                         </div>
                       </div>
 
                       {/* Products per category distribution */}
-                      <div className="col-lg-4">
-                        <div className="card glass-card p-4 border border-secondary border-opacity-10 h-100">
-                          <h5 className="science-font fw-bold mb-4 text-dark"><i className="bi bi-pie-chart-fill text-success me-2"></i>Product Splits</h5>
-                          <ul className="list-group list-group-flush">
-                            {stats.distributions.products.map((dist, idx) => (
-                              <li className="list-group-item d-flex justify-content-between align-items-center bg-transparent border-secondary border-opacity-10 px-0 py-2" key={idx}>
-                                <span className="small text-secondary">{dist.name}</span>
-                                <span className="badge bg-secondary rounded-pill">{dist.count} items</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
+                      <div className="card glass-card p-2.5 border border-secondary border-opacity-10 shadow-sm" style={{ width: '230px', borderRadius: '14px', flexShrink: 0 }}>
+                        <h6 className="science-font fw-bold mb-2 text-dark" style={{ fontSize: '0.85rem' }}><i className="bi bi-pie-chart-fill text-success me-2"></i>Product Splits</h6>
+                        <ul className="list-group list-group-flush">
+                          {stats.distributions.products.map((dist, idx) => (
+                            <li className="list-group-item d-flex justify-content-between align-items-center bg-transparent border-secondary border-opacity-10 px-0 py-1" key={idx}>
+                              <span className="text-secondary fw-medium" style={{ fontSize: '11px' }}>{dist.name}</span>
+                              <span className="badge bg-secondary rounded-pill py-0.5 px-1.5" style={{ fontSize: '10px' }}>{dist.count} items</span>
+                            </li>
+                          ))}
+                        </ul>
                       </div>
                     </div>
                   </div>
@@ -1515,17 +1510,17 @@ const AdminDashboard = () => {
                     <div className="d-flex gap-2 mb-4 border-bottom pb-2">
                       <button
                         type="button"
-                        className={`btn btn-sm rounded-pill px-3 py-1.5 fw-semibold ${officesSubTab === 'directory' ? 'btn-success text-white' : 'btn-light border border-secondary border-opacity-10 text-dark'}`}
+                        className={`btn btn-sm rounded-pill px-3 py-1.5 fw-semibold btn-filter-custom ${officesSubTab === 'directory' ? 'active' : ''}`}
                         onClick={() => { setOfficesSubTab('directory'); setShowForm(false); }}
                       >
-                        <i className="bi bi-building me-1.5"></i> Office Directory
+                        <i className="bi bi-building me-2"></i> Office Directory
                       </button>
                       <button
                         type="button"
-                        className={`btn btn-sm rounded-pill px-3 py-1.5 fw-semibold ${officesSubTab === 'stats' ? 'btn-success text-white' : 'btn-light border border-secondary border-opacity-10 text-dark'}`}
+                        className={`btn btn-sm rounded-pill px-3 py-1.5 fw-semibold btn-filter-custom ${officesSubTab === 'stats' ? 'active' : ''}`}
                         onClick={() => { setOfficesSubTab('stats'); setShowForm(false); }}
                       >
-                        <i className="bi bi-bar-chart-fill me-1.5"></i> Company Statistics
+                        <i className="bi bi-bar-chart-fill me-2"></i> Company Statistics
                       </button>
                     </div>
 
@@ -1697,31 +1692,31 @@ const AdminDashboard = () => {
                     <div className="d-flex gap-2 mb-4 border-bottom pb-2">
                       <button
                         type="button"
-                        className={`btn btn-sm rounded-pill px-3 py-1.5 fw-semibold ${aboutSubTab === 'leadership' ? 'btn-success text-white' : 'btn-light border border-secondary border-opacity-10 text-dark'}`}
+                        className={`btn btn-sm rounded-pill px-3 py-1.5 fw-semibold btn-filter-custom ${aboutSubTab === 'leadership' ? 'active' : ''}`}
                         onClick={() => { setAboutSubTab('leadership'); setShowForm(false); }}
                       >
-                        <i className="bi bi-people-fill me-1.5"></i> Leadership Team
+                        <i className="bi bi-people-fill me-2"></i> Leadership Team
                       </button>
                       <button
                         type="button"
-                        className={`btn btn-sm rounded-pill px-3 py-1.5 fw-semibold ${aboutSubTab === 'vision_values' ? 'btn-success text-white' : 'btn-light border border-secondary border-opacity-10 text-dark'}`}
+                        className={`btn btn-sm rounded-pill px-3 py-1.5 fw-semibold btn-filter-custom ${aboutSubTab === 'vision_values' ? 'active' : ''}`}
                         onClick={() => { setAboutSubTab('vision_values'); setShowForm(false); }}
                       >
-                        <i className="bi bi-eye-fill me-1.5"></i> Vision & Values
+                        <i className="bi bi-eye-fill me-2"></i> Vision & Values
                       </button>
                       <button
                         type="button"
-                        className={`btn btn-sm rounded-pill px-3 py-1.5 fw-semibold ${aboutSubTab === 'history' ? 'btn-success text-white' : 'btn-light border border-secondary border-opacity-10 text-dark'}`}
+                        className={`btn btn-sm rounded-pill px-3 py-1.5 fw-semibold btn-filter-custom ${aboutSubTab === 'history' ? 'active' : ''}`}
                         onClick={() => { setAboutSubTab('history'); setShowForm(false); }}
                       >
-                        <i className="bi bi-clock-history me-1.5"></i> History Timeline
+                        <i className="bi bi-clock-history me-2"></i> History Timeline
                       </button>
                       <button
                         type="button"
-                        className={`btn btn-sm rounded-pill px-3 py-1.5 fw-semibold ${aboutSubTab === 'facility' ? 'btn-success text-white' : 'btn-light border border-secondary border-opacity-10 text-dark'}`}
+                        className={`btn btn-sm rounded-pill px-3 py-1.5 fw-semibold btn-filter-custom ${aboutSubTab === 'facility' ? 'active' : ''}`}
                         onClick={() => { setAboutSubTab('facility'); setShowForm(false); }}
                       >
-                        <i className="bi bi-geo-alt-fill me-1.5"></i> Operating Coordinates
+                        <i className="bi bi-geo-alt-fill me-2"></i> Operating Coordinates
                       </button>
                     </div>
 

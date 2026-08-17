@@ -38,9 +38,9 @@ const Footer = () => {
         <div className="row g-4">
           {/* Logo & About */}
           <div className="col-lg-4 col-md-6">
-            <div className="d-flex align-items-center mb-3">
-              <span className="science-font fw-bold fs-5 text-gradient-bio">BASUNDHARA</span>
-              <span className="science-font fw-light fs-5 text-light ms-1">BIO-TECH</span>
+            <div className="d-flex flex-column text-start mb-3">
+              <span className="brand-logo-title">BASUNDHARA</span>
+              <span className="brand-logo-subtitle">BIO-TECH</span>
             </div>
             <p className="text-secondary small">
               Basundhara Bio-Tech is a modern enterprise integrating biotechnology with sustainable agriculture, clean food processing (dehydration), wellness extracts, circular recycling, and global trade supply logistics.

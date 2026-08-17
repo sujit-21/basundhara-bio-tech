@@ -136,7 +136,7 @@ const Home = () => {
                       <ImageCarousel 
                         images={cat.images && cat.images.length > 0 ? cat.images : [cat.image]} 
                         altText={cat.name} 
-                        height="150px" 
+                        height="160px" 
                       />
                     )}
                     <h4 className="science-font fs-5 fw-bold text-dark mb-2">{cat.name}</h4>
@@ -176,15 +176,15 @@ const Home = () => {
                       <ImageCarousel 
                         images={prod.images && prod.images.length > 0 ? prod.images : [prod.image]} 
                         altText={prod.title} 
-                        height="200px" 
+                        height="160px" 
                       />
                     )}
-                    <div className="d-flex justify-content-between align-items-center mb-2">
-                      <span className="badge bg-success text-white text-xs px-2.5 py-1">{prod.category?.name}</span>
-                      <span className="text-white-50 small font-monospace">{prod.price}</span>
+                    <div className="d-flex justify-content-between align-items-center mb-2 gap-2">
+                      <span className="badge badge-category-bio text-xs px-2.5 py-1">{prod.category?.name}</span>
+                      <span className="product-price-tag font-monospace ms-auto">{prod.price}</span>
                     </div>
                     <h4 className="fs-5 fw-bold text-white mb-2">{prod.title}</h4>
-                    <p className="text-white-50 small mb-4" style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    <p className="text-light opacity-75 small mb-4" style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                       {prod.description}
                     </p>
                     <Link to="/products" className="btn btn-sm btn-outline-light w-100 mt-auto">
@@ -203,9 +203,9 @@ const Home = () => {
       {/* 6. Import/Export Route Teaser */}
       <section className="py-5 bg-gradient-light">
         <div className="container">
-          <div className="glass-card p-5 border-0 text-center" style={{ background: 'rgba(255,255,255,0.9)' }}>
+          <div className="glass-card p-5 text-center shadow-sm">
             <h3 className="science-font fw-bold text-gradient-bio mb-3">Global Supply Chain Compliance</h3>
-            <p className="text-muted max-w-2xl mx-auto mb-4" style={{ maxWidth: '750px' }}>
+            <p className="text-secondary max-w-2xl mx-auto mb-4" style={{ maxWidth: '750px' }}>
               We manage trade corridors supplying organic botanical items, Ayurvedic bases, and upcycled materials to North America, Europe, and the Middle East under standard customs regulations.
             </p>
             <div className="d-flex justify-content-center gap-3">

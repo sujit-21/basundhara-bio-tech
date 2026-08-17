@@ -55,9 +55,8 @@ const Categories = () => {
       <div className="container">
         {/* Header */}
         <div className="text-center mb-5">
-          <span className="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill science-font mb-2">Corporate Sectors</span>
           <h1 className="science-font fw-bold text-gradient-bio">Our Industry Divisions</h1>
-          <p className="text-muted" style={{ maxWidth: '800px', margin: '0 auto' }}>
+          <p className="text-muted fw-medium" style={{ maxWidth: '800px', margin: '0 auto' }}>
             We coordinate operations across critical agro-industrial sectors to build a sustainable global bio-economy.
           </p>
         </div>
@@ -77,7 +76,7 @@ const Categories = () => {
                     <ImageCarousel 
                       images={cat.images && cat.images.length > 0 ? cat.images : [cat.image]} 
                       altText={cat.name} 
-                      height="200px" 
+                      height="160px" 
                     />
                   )}
                   <div className="d-flex align-items-center gap-3 mb-3">

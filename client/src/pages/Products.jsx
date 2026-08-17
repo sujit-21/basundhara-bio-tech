@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../services/api';
+import FullImageModal from '../components/FullImageModal';
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -25,6 +26,7 @@ const Products = () => {
   const [inquiryData, setInquiryData] = useState({ name: '', email: '', subject: '', message: '' });
   const [inquiryLoading, setInquiryLoading] = useState(false);
   const [inquiryAlert, setInquiryAlert] = useState({ show: false, message: '', type: 'success' });
+  const [fullImagePreview, setFullImagePreview] = useState({ show: false, url: '', title: '' });
 
   // Update selected category if URL parameters update
   useEffect(() => {
@@ -177,7 +179,6 @@ const Products = () => {
       <div className="container">
         {/* Header */}
         <div className="text-center mb-5">
-          <span className="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill science-font mb-2">Enterprise Catalog</span>
           <h1 className="science-font fw-bold text-gradient-bio">Organic Products & Services</h1>
           <p className="text-muted" style={{ maxWidth: '800px', margin: '0 auto' }}>
             Browse our catalog of premium agro-biotech inputs, cold-dehydrated leaves, spices, animal feed blocks, and Ayurvedic extract bases.
@@ -204,7 +205,7 @@ const Products = () => {
             <div className="d-flex flex-wrap gap-2 justify-content-lg-end">
               <button
                 onClick={() => handleCategorySelect('All')}
-                className={`btn btn-sm px-3 py-2 rounded-pill science-font fw-semibold ${selectedCategory === 'All' ? 'btn-success text-white' : 'btn-light border border-secondary border-opacity-10 text-dark'}`}
+                className={`btn btn-sm px-3 py-2 rounded-pill science-font btn-filter-custom ${selectedCategory === 'All' ? 'active' : ''}`}
               >
                 All Sectors
               </button>
@@ -212,7 +213,7 @@ const Products = () => {
                 <button
                   key={cat._id}
                   onClick={() => handleCategorySelect(cat.name)}
-                  className={`btn btn-sm px-3 py-2 rounded-pill science-font fw-semibold ${selectedCategory === cat.name ? 'btn-success text-white' : 'btn-light border border-secondary border-opacity-10 text-dark'}`}
+                  className={`btn btn-sm px-3 py-2 rounded-pill science-font btn-filter-custom ${selectedCategory === cat.name ? 'active' : ''}`}
                 >
                   {cat.name}
                 </button>
@@ -240,33 +241,53 @@ const Products = () => {
               {products.map((prod) => (
                 <div className="col-lg-4 col-md-6" key={prod._id}>
                   <div className="card glass-card h-100 p-3 border border-secondary border-opacity-10 d-flex flex-column">
-                    <img
-                      src={prod.image}
-                      alt={prod.title}
-                      className="img-fluid rounded mb-3 object-fit-cover"
-                      style={{ height: '220px', width: '100%' }}
-                    />
+                    <div 
+                      className="position-relative mb-3 overflow-hidden group-hover-container shadow-sm" 
+                      style={{ height: '160px', borderRadius: '14px', cursor: 'pointer' }}
+                      onClick={() => setFullImagePreview({ show: true, url: prod.image, title: prod.title })}
+                    >
+                      <img
+                        src={prod.image}
+                        alt={prod.title}
+                        className="img-fluid object-fit-cover w-100 h-100 hover-zoom"
+                        style={{ borderRadius: '14px' }}
+                      />
+                      {/* Zoom Floating Action Button for Admin & Users */}
+                      <button 
+                        type="button"
+                        onClick={(e) => { 
+                          e.stopPropagation(); 
+                          setFullImagePreview({ show: true, url: prod.image, title: prod.title }); 
+                        }}
+                        className="position-absolute top-0 end-0 m-2 btn btn-dark btn-sm rounded-circle bg-opacity-75 text-white border-0 shadow d-flex align-items-center justify-content-center"
+                        style={{ zIndex: 10, width: '34px', height: '34px', backdropFilter: 'blur(4px)' }}
+                        title="Click to view full image"
+                      >
+                        <i className="bi bi-zoom-in fs-6"></i>
+                      </button>
+                    </div>
+                    
                     <div className="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
                       <div className="d-flex gap-1.5 flex-wrap">
-                        <span className="badge bg-success bg-opacity-10 text-success px-2.5 py-1 rounded small science-font">
+                        <span className="badge badge-category-bio px-2.5 py-1 rounded small science-font">
                           {prod.category?.name}
                         </span>
                         {prod.subCategory && (
-                          <span className="badge bg-light text-secondary border px-2.5 py-1 rounded small science-font">
+                          <span className="badge badge-subcategory-bio px-2.5 py-1 rounded small science-font">
                             {prod.subCategory}
                           </span>
                         )}
                       </div>
-                      <span className="text-muted small font-monospace">{prod.price}</span>
+                      <span className="product-price-tag font-monospace ms-auto">{prod.price}</span>
                     </div>
-                    <h4 className="science-font card-title fs-5 fw-bold text-dark mb-2">{prod.title}</h4>
-                    <p className="card-text text-muted small mb-4 flex-grow-1" style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    <h4 className="science-font card-title fs-5 fw-bold product-card-title mb-2">{prod.title}</h4>
+                    <p className="card-text product-card-desc small mb-4 flex-grow-1" style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                       {prod.description}
                     </p>
                     <div className="d-flex gap-2 mt-auto">
                       <button
                         onClick={() => openSpecsModal(prod)}
-                        className="btn btn-outline-secondary btn-sm flex-grow-1"
+                        className="btn btn-outline-secondary btn-sm flex-grow-1 fw-semibold"
                         data-bs-toggle="modal"
                         data-bs-target="#productSpecsModal"
                       >
@@ -339,12 +360,24 @@ const Products = () => {
                     
                     <div className="row g-4">
                       <div className="col-md-5">
-                        <img
-                          src={activeImage || activeProduct.image}
-                          alt={activeProduct.title}
-                          className="img-fluid rounded-3 object-fit-cover mb-2"
-                          style={{ height: '220px', width: '100%' }}
-                        />
+                        <div className="position-relative mb-2">
+                          <img
+                            src={activeImage || activeProduct.image}
+                            alt={activeProduct.title}
+                            className="img-fluid rounded-3 object-fit-cover w-100"
+                            style={{ height: '220px', cursor: 'pointer' }}
+                            onClick={() => setFullImagePreview({ show: true, url: activeImage || activeProduct.image, title: activeProduct.title })}
+                          />
+                          <button 
+                            type="button"
+                            onClick={() => setFullImagePreview({ show: true, url: activeImage || activeProduct.image, title: activeProduct.title })}
+                            className="position-absolute top-0 end-0 m-2 btn btn-dark btn-sm rounded-circle bg-opacity-75 text-white border-0 shadow d-flex align-items-center justify-content-center"
+                            style={{ zIndex: 10, width: '34px', height: '34px', backdropFilter: 'blur(4px)' }}
+                            title="Click to view full image"
+                          >
+                            <i className="bi bi-zoom-in fs-6"></i>
+                          </button>
+                        </div>
                         {activeProduct.images && activeProduct.images.length > 1 && (
                           <div className="d-flex gap-2 overflow-x-auto py-1" style={{ scrollbarWidth: 'thin' }}>
                             {activeProduct.images.map((imgSrc, idx) => (
@@ -352,7 +385,7 @@ const Products = () => {
                                 key={idx}
                                 src={imgSrc}
                                 alt={`Thumbnail ${idx}`}
-                                className={`img-thumbnail rounded object-fit-cover ${activeImage === imgSrc ? 'border-success border-2' : ''}`}
+                                className={`img-thumbnail rounded object-fit-cover ${activeImage === imgSrc ? 'border-primary border-2' : ''}`}
                                 style={{ width: '50px', height: '50px', cursor: 'pointer', opacity: activeImage === imgSrc ? 1 : 0.6, transition: 'all 0.2s ease' }}
                                 onClick={() => setActiveImage(imgSrc)}
                               />
@@ -362,7 +395,7 @@ const Products = () => {
                       </div>
                       <div className="col-md-7">
                         <h6 className="science-font fw-bold text-success">Product Description</h6>
-                        <p className="text-secondary small mb-3">{activeProduct.description}</p>
+                        <p className="product-card-desc small mb-3">{activeProduct.description}</p>
                         
                         <h6 className="science-font fw-bold text-primary">Standard Specifications</h6>
                         <ul className="list-group list-group-flush mb-3">
@@ -374,8 +407,8 @@ const Products = () => {
                         </ul>
                         
                         <div className="d-flex justify-content-between align-items-center border-top pt-2">
-                          <span className="text-muted small">Price Target: <strong className="text-dark font-monospace">{activeProduct.price}</strong></span>
-                          <span className="badge bg-success">{activeProduct.inStock ? 'Available' : 'Out of Stock'}</span>
+                          <span className="text-secondary small">Price Target: <strong className="product-price-tag font-monospace">{activeProduct.price}</strong></span>
+                          <span className="badge bg-success px-3 py-1.5">{activeProduct.inStock ? 'Available' : 'Out of Stock'}</span>
                         </div>
                       </div>
                     </div>
@@ -439,6 +472,14 @@ const Products = () => {
           </div>
         </div>
       )}
+
+      {/* Full Image Preview Modal */}
+      <FullImageModal
+        show={fullImagePreview.show}
+        imageUrl={fullImagePreview.url}
+        title={fullImagePreview.title}
+        onClose={() => setFullImagePreview({ show: false, url: '', title: '' })}
+      />
     </div>
   );
 };

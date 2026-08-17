@@ -15,14 +15,13 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
     );
   }
 
-  // Not logged in
-  if (!user) {
-    return <Navigate to="/login" replace />;
+  // Not logged in or logged in but not admin when admin clearance is required
+  if (adminOnly && (!user || !isAdmin)) {
+    return <Navigate to="/404" replace />;
   }
 
-  // Logged in but not admin when admin clearance is required
-  if (adminOnly && !isAdmin) {
-    return <Navigate to="/" replace />;
+  if (!user) {
+    return <Navigate to="/login" replace />;
   }
 
   return children;
