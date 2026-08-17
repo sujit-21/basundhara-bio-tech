@@ -531,7 +531,7 @@ const AdminDashboard = () => {
           {/* Mobile Sidebar Toggle Header */}
           <div className="d-md-none col-12 p-3 border-bottom border-secondary border-opacity-10 d-flex justify-content-between align-items-center bg-dark text-white">
             <div className="science-font fw-bold text-success d-flex align-items-center">
-              <i className="bi bi-shield-lock-fill me-2 fs-5"></i> Trade Console
+              <i className="bi bi-shield-lock-fill me-2 fs-5"></i> Admin Console
             </div>
             <button 
               className="btn btn-sm btn-outline-success border-0 text-white" 
